@@ -1,0 +1,364 @@
+:root {
+    --bg-dark: #0b0b0b;
+    --accent-teal: #369ca3;
+    --accent-fuchsia: #8a2991;
+    --warning-yellow: #b08737;
+    --text-muted: #888888;
+    --bg-card: #161616;
+    --border-card: #2a2a2a;
+    --bg-card-translucent: rgba(22, 22, 22, 0.5); 
+      /* 0.7 correspond à 70 % d'opacité */
+    --h3size: 2.5rem;
+    --h3weight: 800;  /* 100 fin à 900 gras */
+}
+
+/* --- RESET & BASE --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: #0b0b0b;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+}
+
+#pave-radio, #pave-featured, #pave-working {
+    background-color: rgba(18, 18, 18, 0.25);
+}
+
+/* --- GRILLE DESKTOP (4 pavés côte à côte) --- */
+.grid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000;
+}
+
+/* --- STYLE DES PAVÉS --- */
+.pave {
+    flex: 0 0 25%;
+    height: 100vh;
+    background-color: #121212;
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid #222;
+}
+
+.pave:last-child {
+    border-right: none;
+}
+
+.pave-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+/* --- ALIGNEMENT DES TEXTES : GAUCHE PAR DÉFAUT --- */
+.pave-header {
+    position: absolute;
+    top: 25px;
+    left: 20px;
+    right: 20px;
+    z-index: 2;
+    text-align: left; /* Alignment à gauche pour les légendes et titres */
+}
+
+.pave-header h2, .pave-header p {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+/* --- POCHETTES CARRÉES 60% : ANCRAGE ABSOLU AU CENTRE D'ÉCRAN --- */
+#featured-artwork-container,
+#working-artwork-container,
+.artwork-box {
+    position: absolute !important;
+    top: 65% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important; /* Calé au centre géométrique exact */
+    width: 60% !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    margin: 0 !important;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+}
+
+/* --- ZONES EN BAS (LECTEUR ET CHRONO) --- */
+.pave-footer {
+    position: absolute;
+    bottom: 25px;
+    left: 20px;
+    right: 20px;
+    z-index: 2;
+    text-align: center;
+}
+
+#featured-track-title {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* --- PAVÉ 2 (RADIO) SPECIFIQUE CENTRÉ --- */
+#pave-radio .pave-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    padding: 25px 20px;
+}
+
+/* --- PAVÉ 3 (FEATURED) LOOP ACTIVE --- */
+/* --- BOUTONS ET BADGES --- */
+.btn-link, .btn-ctrl, .btn-mini {
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 8px 12px;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn-link:hover, .btn-ctrl:hover {
+    background: #444;
+}
+
+/* Alignement et design des contrôles du Pavé 3 */
+.custom-parser-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+}
+
+.custom-parser-controls .btn-mini {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.custom-parser-controls .btn-mini:hover {
+    background: #333;
+    border-color: #555;
+}
+
+.custom-parser-controls .btn-mini.active {
+    background: var(--accent-fuchsia);
+    border-color: var(--accent-fuchsia);
+    color: #ffffff;
+}
+
+.custom-parser-controls input[type="range"] {
+    accent-color: #ff3333;
+    cursor: pointer;
+}
+
+#feat-seek {
+    flex: 1;
+    min-width: 60px;
+    height: 4px;
+}
+
+#feat-volume {
+    width: 50px;
+    height: 4px;
+}
+
+/* --- RESPONSIVE MOBILE (Mode Portrait) --- */
+@media (max-width: 1024px) and (orientation: portrait) {
+    html, body {
+        overflow-x: scroll;
+        overflow-y: hidden;
+    }
+
+    .grid-container {
+        display: flex;
+        flex-direction: row;
+        width: 400vw;
+        height: 100vh;
+        overflow-x: scroll;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pave {
+        flex: 0 0 100vw;
+        width: 100vw;
+        height: 100vh;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+}
+
+/* Boutons de switch de langue EN / RU */
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    color: #444;
+}
+
+.btn-lang {
+    background: none;
+    border: none;
+    color: #666;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 4px;
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
+}
+
+.btn-lang:hover {
+    color: #aaa;
+}
+
+.btn-lang.active {
+    color: #ffffff;
+    border-bottom: 2px solid var(--accent-fuchsia);
+}
+
+/* Prise en compte des retours à la ligne \n */
+.pave-header p, 
+.pave-header h4 {
+    white-space: pre-line;
+}
+
+/* --- TITRES D'EN-TÊTE PANNEAUX 2, 3 ET 4 (PLUS GRANDS ET DÉGAGÉS) --- */
+.pave-header h3 {
+    font-size: var(--h3size);
+    font-weight: var(--h3weight);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 18px;
+    display: inline-block;
+}
+
+#pave-featured .pave-header h3 {
+    color: var(--accent-fuchsia);
+}
+
+/* Affichage de la date [FEATURED] */
+.featured-date {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+/* --- FIX PAVÉ 1 : BOUTONS CARRE/DEBOUTS & SANS DÉBORDEMENT --- */
+#pave-landing .pave-footer {
+    left: 15px;
+    right: 15px;
+    bottom: 20px;
+    box-sizing: border-box;
+}
+
+.social-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 45%;
+    box-sizing: border-box;
+    margin-left: 20;
+    margin-right: auto;
+}
+
+.social-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background: var(--bg-card); */
+    background: var(--bg-card-translucent);
+    border: 1px solid var(--border-card);
+    color: #ffffff;
+    padding: 12px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    aspect-ratio: 4 / 5; /* largeur x hauteur */
+    box-sizing: border-box;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+}
+
+.social-btn:hover {
+    background: #202020;
+    border-color: var(--accent-fuchsia);
+    transform: translateY(-2px);
+}
+
+/* Icône de remplacement ou SVG en grand au centre */
+.social-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+}
+
+.social-icon img {
+    max-height: 44px;
+    max-width: 44px;
+    object-fit: contain;
+}
+
+.social-label {
+    font-size: 0.5rem;
+    font-weight: 500;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.social-grid .social-btn:nth-child(1) { border-color: var(--accent-teal); }
+.social-grid .social-btn:nth-child(2) { border-color: var(--accent-teal); }
+.social-grid .social-btn:nth-child(3) { border-color: var(--accent-fuchsia); }
+.social-grid .social-btn:nth-child(4) { border-color: var(--warning-yellow); }
+
+/* Fond d'écran unique pour les panneaux 2, 3 et 4 */
+@media (min-width: 1025px) {
+    .grid-container::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 25%;  /* Démarre exactement au début du Pavé 2 */
+        width: 75%; /* Occupe toute la largeur des Pavés 2, 3 et 4 */
+        height: 100%;
+        background-image: url('Fond.webp'); 
+        background-size: cover;
+        background-position: center;
+        z-index: 0;
+        pointer-events: none;
+    }
+}
