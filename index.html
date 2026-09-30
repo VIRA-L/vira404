@@ -31,68 +31,79 @@
             </div>
         </section>
 
-<!-- PAVÉ 2 : Live Radio -->
-<section class="pave pave-2" id="pave-radio">
-    <div class="pave-content">
-        <div class="pave-header">
-            <h3>LIVE RADIO</h3>
-            <span class="live-badge">🔴 ON AIR</span>
-            <p id="radio-track-title"></p>
-        </div>
-        <div class="artwork-box" id="radio-artwork-container"></div>
-        <div class="lyrics-box" id="radio-lyrics">
-            <p class="lyric-line">Chargement des ondes...</p>
-        </div>
-        <div class="pave-footer">
-            <div class="audio-controls">
-                <button id="radio-play-btn" class="btn-ctrl">▶ ON / OFF</button>
-                <input type="range" id="radio-volume" min="0" max="1" step="0.01" value="0.8">
-                <a id="radio-download-btn" href="#" class="btn-ctrl" download>⬇ Download</a>
-            </div>
-        </div>
-        <audio id="radio-audio" preload="none"></audio>
-    </div>
-</section>
+        <!-- PAVÉ 2 : Live Radio -->
+        <section class="pave pave-2" id="pave-radio">
+            <div class="pave-content">
+                <div class="pave-header">
+                    <h3>LIVE RADIO</h3>
+                    <span id="radio-badge" class="live-badge is-off">OFF AIR</span>
+                </div>
 
-<!-- PAVÉ 3 : Featured Drop -->
-<section class="pave pave-3" id="pave-featured">
-    <div class="pave-content">
-        <div class="pave-header">
-            <h3>FEATURED</h3>
-            <p id="featured-date" class="featured-date"></p>
-            <p id="featured-caption"></p>
-        </div>
-        <div class="artwork-box" id="featured-artwork-container"></div>
-        <div class="pave-footer">
-            <h4 id="featured-track-title"></h4>
-            <div class="custom-parser-controls">
-                <button id="feat-rewind" class="btn-mini" title="Reculer 10s">⏪</button>
-                <button id="feat-play" class="btn-mini" title="Lecture / Pause">⏯️</button>
-                <button id="feat-forward" class="btn-mini" title="Avancer 10s">⏩</button>
-                <button id="feat-loop" class="btn-mini" title="Lecture en boucle">🔁</button>
-                <input type="range" id="feat-seek" value="0" max="100" title="Position">
-                <input type="range" id="feat-volume" min="0" max="1" step="0.01" value="0.8" title="Volume">
-            </div>
-        </div>
-        <audio id="featured-audio" preload="metadata"></audio>
-    </div>
-</section>
+                <div class="pave-footer">
+                    <div class="radio-meta-grid">
+                        <h4 id="radio-track-title"></h4>
+                        <p id="radio-track-info"></p>
+                        <p id="radio-album-name"></p>
+                    </div>
+                    
+                    <div id="radio-lyrics-container" class="radio-lyrics">---</div>
+                    <a id="radio-download-btn" style="display:none;" href="" download></a>
 
-<!-- PAVÉ 4 : Working / Next Drop -->
-<section class="pave pave-4" id="pave-working">
-    <div class="pave-content">
-        <div class="pave-header">
-            <h3>WORKING</h3>
-            <h4 id="working-title"></h4>
-            <p id="working-caption1"></p>
-            <p id="working-caption2"></p>
-        </div>
-        <div class="artwork-box" id="working-artwork-container"></div>
-        <div class="pave-footer">
-            <div id="countdown-timer">00j 00h 00m 00s</div>
-        </div>
-    </div>
-</section>
+                    <div class="radio-controls-row">
+                        <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Cover Morceau" />
+                        <button id="radio-toggle-btn" class="btn-ctrl" title="Lecture / Pause">▶</button>
+                        <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Cover Album" />
+                    </div>
+                </div>
+
+                <audio id="radio-audio" preload="none"></audio>
+            </div>
+        </section>
+
+        <!-- PAVÉ 3 : Featured Drop -->
+        <section class="pave pave-3" id="pave-featured">
+            <div class="pave-content">
+                <div class="pave-header">
+                    <h3>FEATURED</h3>
+                    <p id="featured-date" class="featured-date"></p>
+                    <p id="featured-caption"></p>
+                </div>
+
+                <div class="artwork-box" id="featured-artwork-container"></div>
+
+                <div class="pave-footer">
+                    <h4 id="featured-track-title"></h4>
+                    <div class="custom-parser-controls">
+                        <button id="feat-rewind" class="btn-mini" title="Reculer 10s">⏪</button>
+                        <button id="feat-play" class="btn-mini" title="Lecture / Pause">⏯️</button>
+                        <button id="feat-forward" class="btn-mini" title="Avancer 10s">⏩</button>
+                        <button id="feat-loop" class="btn-mini" title="Lecture en boucle">🔁</button>
+                        <input type="range" id="feat-seek" value="0" max="100" title="Position">
+                        <input type="range" id="feat-volume" min="0" max="1" step="0.01" value="0.8" title="Volume">
+                    </div>
+                </div>
+
+                <audio id="featured-audio" preload="metadata"></audio>
+            </div>
+        </section>
+
+        <!-- PAVÉ 4 : Working / Next Drop -->
+        <section class="pave pave-4" id="pave-working">
+            <div class="pave-content">
+                <div class="pave-header">
+                    <h3>WORKING</h3>
+                    <h4 id="working-title"></h4>
+                    <p id="working-caption1"></p>
+                    <p id="working-caption2"></p>
+                </div>
+
+                <div class="artwork-box" id="working-artwork-container"></div>
+
+                <div class="pave-footer">
+                    <div id="countdown-timer">00j 00h 00m 00s</div>
+                </div>
+            </div>
+        </section>
 
     </main>
 

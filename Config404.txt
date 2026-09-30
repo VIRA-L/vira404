@@ -26,13 +26,13 @@ caption3 = "\n"
 
 [FEATURED]
 track = "Не гаси — alternative rock [RU] · Vira L."
-caption = "Не гаси — alternative rock [RU] is out \n\nVira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀\n#Cyberworld #Unsubscribe #NoCodeGirl"
+caption = "Не гаси — alternative rock [RU] is out! \n\nVira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀\n#Cyberworld #Unsubscribe #NoCodeGirl"
 artwork = "featured.webp" 
 date = "22.09.2025"
 
 [WORKING]
 title = "ЗООДИАК\nNew album | новый альбом"
 caption1 = "Vira L. is 🐀 Neural. Lethal. Primal.🐉 She holds the scalpel.👎\nЗоопарк скоро откроется #Zootechnics #NoCodeGirl #Unsubscribe"
-caption2 = "\n\n\n23.09.2026 - finished КРЫСА — alt rock [RU]\n\n23.09.2026 - Track 02 - work in progress..."
+caption2 = "\n\n23.09.2026 - finished КРЫСА — alt rock [RU]\n\n30.09.2026 - Track 02 - work in progress..."
 artwork = "working.webp" 
 date = "2144-12-31T18:00:00Z"

@@ -1,15 +1,14 @@
 :root {
     --bg-dark: #0b0b0b;
     --accent-teal: #369ca3;
-    --accent-fuchsia: #8a2991;
+    --accent-fuchsia: #a335ab;
     --warning-yellow: #b08737;
     --text-muted: #888888;
     --bg-card: #161616;
     --border-card: #2a2a2a;
     --bg-card-translucent: rgba(22, 22, 22, 0.5); 
-      /* 0.7 correspond à 70 % d'opacité */
     --h3size: 2.5rem;
-    --h3weight: 800;  /* 100 fin à 900 gras */
+    --h3weight: 800;
 }
 
 /* --- RESET & BASE --- */
@@ -21,32 +20,33 @@
 
 html, body {
     width: 100%;
-    height: 100%;
-    background-color: #0b0b0b;
+    height: 100dvh;
+    background-color: var(--bg-dark);
     color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     overflow: hidden;
 }
 
-#pave-radio, #pave-featured, #pave-working {
-    background-color: rgba(18, 18, 18, 0.25);
-}
-
-/* --- GRILLE DESKTOP (4 pavés côte à côte) --- */
+/* --- GRILLE DESKTOP (4 PAVÉS) --- */
 .grid-container {
     display: flex;
     flex-direction: row;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background-color: #000;
+    position: relative;
+    background-image: url('Fond.webp');
+    background-size: 75% 100%;
+    background-position: right top;
+    background-repeat: no-repeat;
 }
 
-/* --- STYLE DES PAVÉS --- */
+/* --- STYLE GÉNÉRAL DES PAVÉS --- */
 .pave {
     flex: 0 0 25%;
-    height: 100vh;
-    background-color: #121212;
+    height: 100dvh;
+    background-color: rgba(18, 18, 18, 0.25);
     position: relative;
     overflow: hidden;
     border-right: 1px solid #222;
@@ -56,6 +56,10 @@ html, body {
     border-right: none;
 }
 
+#pave-landing {
+    background-color: #121212;
+}
+
 .pave-content {
     width: 100%;
     height: 100%;
@@ -63,29 +67,58 @@ html, body {
     z-index: 2;
 }
 
-/* --- ALIGNEMENT DES TEXTES : GAUCHE PAR DÉFAUT --- */
+/* --- EN-TÊTES DES PAVÉS --- */
 .pave-header {
     position: absolute;
     top: 25px;
     left: 20px;
     right: 20px;
     z-index: 2;
-    text-align: left; /* Alignment à gauche pour les légendes et titres */
+    text-align: left;
 }
 
-.pave-header h2, .pave-header p {
+.pave-header h2, 
+.pave-header p,
+.pave-header h4 {
     text-align: left;
     margin-bottom: 5px;
+    white-space: pre-line;
 }
 
-/* --- POCHETTES CARRÉES 60% : ANCRAGE ABSOLU AU CENTRE D'ÉCRAN --- */
+.pave-header h3 {
+    font-size: var(--h3size);
+    font-weight: var(--h3weight);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 18px;
+    display: inline-block;
+}
+
+#pave-featured .pave-header h3 {
+    color: var(--accent-fuchsia);
+}
+
+#landing-subtitle {
+    font-weight: 600; 
+}
+
+.featured-date {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-teal);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+/* --- POCHETTES ET VISUELS CENTRÉS (PAVÉS 3 & 4) --- */
 #featured-artwork-container,
 #working-artwork-container,
 .artwork-box {
     position: absolute !important;
     top: 65% !important;
     left: 50% !important;
-    transform: translate(-50%, -50%) !important; /* Calé au centre géométrique exact */
+    transform: translate(-50%, -50%) !important;
     width: 60% !important;
     aspect-ratio: 1 / 1 !important;
     height: auto !important;
@@ -95,7 +128,7 @@ html, body {
     z-index: 1;
 }
 
-/* --- ZONES EN BAS (LECTEUR ET CHRONO) --- */
+/* --- ZONES BASSES (FOOTERS, LECTEURS, CHRONO) --- */
 .pave-footer {
     position: absolute;
     bottom: 25px;
@@ -113,7 +146,85 @@ html, body {
     text-align: center;
 }
 
-/* --- PAVÉ 2 (RADIO) SPECIFIQUE CENTRÉ --- */
+#countdown-timer {
+    font-size: 1.3rem;        
+    font-weight: 900;        
+    letter-spacing: 0px;
+    margin-top: 10px;        
+}
+
+/* --- PAVÉ 1 : BOUTONS RÉSEAUX / LIENS --- */
+#pave-landing .pave-footer {
+    left: 15px;
+    right: 15px;
+    bottom: 20px;
+    box-sizing: border-box;
+}
+
+.social-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 45%;
+    box-sizing: border-box;
+    margin-left: 20px;
+    margin-right: auto;
+}
+
+.social-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card-translucent);
+    border: 1px solid var(--border-card);
+    color: #ffffff;
+    padding: 12px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    aspect-ratio: 4 / 5;
+    box-sizing: border-box;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+}
+
+.social-btn:hover {
+    background: #202020;
+    border-color: var(--accent-fuchsia);
+    transform: translateY(-2px);
+}
+
+.social-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+}
+
+.social-icon img {
+    max-height: 44px;
+    max-width: 44px;
+    object-fit: contain;
+}
+
+.social-label {
+    font-size: 0.5rem;
+    font-weight: 500;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.social-grid .social-btn:nth-child(1) { border-color: var(--accent-teal); }
+.social-grid .social-btn:nth-child(2) { border-color: var(--accent-teal); }
+.social-grid .social-btn:nth-child(3) { border-color: var(--accent-fuchsia); }
+.social-grid .social-btn:nth-child(4) { border-color: var(--warning-yellow); }
+
+/* --- PAVÉ 2 : SPECIFIQUE LIVE RADIO & PAROLES KARAOKÉ --- */
 #pave-radio .pave-content {
     display: flex;
     flex-direction: column;
@@ -123,8 +234,104 @@ html, body {
     padding: 25px 20px;
 }
 
-/* --- PAVÉ 3 (FEATURED) LOOP ACTIVE --- */
-/* --- BOUTONS ET BADGES --- */
+#radio-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border: 1px solid #333;
+    transition: all 0.3s ease;
+}
+
+#radio-badge.active {
+    color: #ff3333;
+    border-color: #ff3333;
+    background: rgba(255, 51, 51, 0.15);
+    box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+}
+
+#radio-lyrics-box {
+    width: 100%;
+    max-height: 220px;
+    overflow-y: hidden;
+    margin: 15px 0;
+    padding: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-teal) transparent;
+}
+
+.srt-line {
+    font-size: 0.95rem;
+    color: var(--accent-fuchsia);
+    margin: 8px 0;
+    transition: color 0.3s ease, font-size 0.3s ease, transform 0.3s ease;
+}
+
+.srt-line.active {
+    color: var(--accent-teal) !important;
+    font-weight: bold;
+    font-size: 1.05rem;
+}
+
+.radio-meta-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+#radio-track-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+#radio-track-info, #radio-album-name {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.radio-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.radio-cover-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--border-card);
+}
+
+#radio-toggle-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent-fuchsia);
+    border: none;
+    color: #ffffff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+}
+
+#radio-toggle-btn:hover {
+    transform: scale(1.08);
+    background: var(--accent-teal);
+}
+
+/* --- BOUTONS, SWITCH & LECTEUR PARSER (PAVÉ 3) --- */
 .btn-link, .btn-ctrl, .btn-mini {
     background: #222;
     color: #fff;
@@ -139,7 +346,6 @@ html, body {
     background: #444;
 }
 
-/* Alignement et design des contrôles du Pavé 3 */
 .custom-parser-controls {
     display: flex;
     align-items: center;
@@ -172,7 +378,7 @@ html, body {
 }
 
 .custom-parser-controls input[type="range"] {
-    accent-color: #ff3333;
+    accent-color: var(--accent-fuchsia);
     cursor: pointer;
 }
 
@@ -187,33 +393,6 @@ html, body {
     height: 4px;
 }
 
-/* --- RESPONSIVE MOBILE (Mode Portrait) --- */
-@media (max-width: 1024px) and (orientation: portrait) {
-    html, body {
-        overflow-x: scroll;
-        overflow-y: hidden;
-    }
-
-    .grid-container {
-        display: flex;
-        flex-direction: row;
-        width: 400vw;
-        height: 100vh;
-        overflow-x: scroll;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .pave {
-        flex: 0 0 100vw;
-        width: 100vw;
-        height: 100vh;
-        scroll-snap-align: start;
-        flex-shrink: 0;
-    }
-}
-
-/* Boutons de switch de langue EN / RU */
 .lang-switch {
     display: flex;
     align-items: center;
@@ -243,122 +422,35 @@ html, body {
     border-bottom: 2px solid var(--accent-fuchsia);
 }
 
-/* Prise en compte des retours à la ligne \n */
-.pave-header p, 
-.pave-header h4 {
-    white-space: pre-line;
-}
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 1024px) {
+    .grid-container {
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+        height: 100dvh;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        background-attachment: local;
+        background-size: 300vw 100%;
+        background-position: 100vw top;
+    }
 
-/* --- TITRES D'EN-TÊTE PANNEAUX 2, 3 ET 4 (PLUS GRANDS ET DÉGAGÉS) --- */
-.pave-header h3 {
-    font-size: var(--h3size);
-    font-weight: var(--h3weight);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent-teal);
-    margin-bottom: 18px;
-    display: inline-block;
-}
+    .pave {
+        flex: 0 0 100vw;
+        width: 100vw;
+        height: 100dvh;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        flex-shrink: 0;
+    }
 
-#pave-featured .pave-header h3 {
-    color: var(--accent-fuchsia);
-}
-
-/* Affichage de la date [FEATURED] */
-.featured-date {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--accent-teal);
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-}
-
-/* --- FIX PAVÉ 1 : BOUTONS CARRE/DEBOUTS & SANS DÉBORDEMENT --- */
-#pave-landing .pave-footer {
-    left: 15px;
-    right: 15px;
-    bottom: 20px;
-    box-sizing: border-box;
-}
-
-.social-grid {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    width: 45%;
-    box-sizing: border-box;
-    margin-left: 20;
-    margin-right: auto;
-}
-
-.social-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* background: var(--bg-card); */
-    background: var(--bg-card-translucent);
-    border: 1px solid var(--border-card);
-    color: #ffffff;
-    padding: 12px 8px;
-    border-radius: 8px;
-    text-decoration: none;
-    aspect-ratio: 4 / 5; /* largeur x hauteur */
-    box-sizing: border-box;
-    transition: border-color 0.2s, transform 0.2s, background 0.2s;
-}
-
-.social-btn:hover {
-    background: #202020;
-    border-color: var(--accent-fuchsia);
-    transform: translateY(-2px);
-}
-
-/* Icône de remplacement ou SVG en grand au centre */
-.social-icon {
-    font-size: 2.2rem;
-    line-height: 1;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 48px;
-}
-
-.social-icon img {
-    max-height: 44px;
-    max-width: 44px;
-    object-fit: contain;
-}
-
-.social-label {
-    font-size: 0.5rem;
-    font-weight: 500;
-    color: #cccccc;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-align: center;
-}
-
-.social-grid .social-btn:nth-child(1) { border-color: var(--accent-teal); }
-.social-grid .social-btn:nth-child(2) { border-color: var(--accent-teal); }
-.social-grid .social-btn:nth-child(3) { border-color: var(--accent-fuchsia); }
-.social-grid .social-btn:nth-child(4) { border-color: var(--warning-yellow); }
-
-/* Fond d'écran unique pour les panneaux 2, 3 et 4 */
-@media (min-width: 1025px) {
-    .grid-container::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 25%;  /* Démarre exactement au début du Pavé 2 */
-        width: 75%; /* Occupe toute la largeur des Pavés 2, 3 et 4 */
-        height: 100%;
-        background-image: url('Fond.webp'); 
-        background-size: cover;
-        background-position: center;
-        z-index: 0;
-        pointer-events: none;
+    .social-grid {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
     }
 }

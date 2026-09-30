@@ -1,34 +1,40 @@
 let parsedConfig = null;
-let currentLang = 'EN';
+let currentLang = localStorage.getItem('userLang') || 'EN'; // <--- MODIFIÉ ICI
+let catalogueTracks = [];
+let totalRadioDuration = 0;
+let currentRadioTrackIndex = -1;
+let radioSrtData = [];
+let radioInterval = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    async function initApp() {
+        let configText = "";
+        let catalogueText = "";
+
+        try {
+            const resConfig = await fetch('Config404.txt');
+            if (!resConfig.ok) throw new Error();
+            configText = await resConfig.text();
+        } catch (e) {
+            configText = await askUserForFile("Sélectionne ton fichier : Config404.txt");
+        }
+
+        if (configText) processConfig(configText);
+
+        try {
+            const resCat = await fetch('Catalogue Vira L.txt');
+            if (!resCat.ok) throw new Error();
+            catalogueText = await resCat.text();
+        } catch (e) {
+            catalogueText = await askUserForFile("Sélectionne ton fichier : Catalogue Vira L.txt");
+        }
+
+        if (catalogueText) processCatalogue(catalogueText);
+    }
+
+    // Appel indispensable de l'initialisation pour que tout se lance
     initApp();
 });
-
-async function initApp() {
-    let configText = "";
-    let catalogueText = "";
-
-    // Tentative de chargement normal (fonctionnera direct sur GitHub Pages)
-    try {
-        const resConfig = await fetch('Config404.txt');
-        configText = await resConfig.text();
-    } catch (e) {
-        // Si Opera bloque en local, on demande les fichiers à l'utilisateur
-        configText = await askUserForFile("Sélectionne ton fichier : Config404.txt");
-    }
-
-    try {
-        const resCat = await fetch('Catalogue Vira L.txt');
-        catalogueText = await resCat.text();
-    } catch (e) {
-        catalogueText = await askUserForFile("Sélectionne ton fichier : Catalogue Vira L.txt");
-    }
-
-    // Traitement des données récupérées
-    if (configText) processConfig(configText);
-    if (catalogueText) processCatalogue(catalogueText);
-}
 
 // Petite boîte de secours pour choisir le fichier si le navigateur bloque
 function askUserForFile(message) {
@@ -52,21 +58,20 @@ function askUserForFile(message) {
     });
 }
 
-// --- TRAITEMENT CONFIG ---
+// --- CONFIG & PAVÉ 3 (RESTAURÉ À L'IDENTIQUE) ---
 function processConfig(text) {
     parsedConfig = parseConfigTxt(text);
 
-    // Écouteurs sur les boutons de langue
     const btnEn = document.getElementById('btn-lang-en');
     const btnRu = document.getElementById('btn-lang-ru');
-
     if (btnEn) btnEn.onclick = () => switchLanguage('EN');
     if (btnRu) btnRu.onclick = () => switchLanguage('RU');
+    if (btnEn) btnEn.classList.toggle('active', currentLang === 'EN');
+    if (btnRu) btnRu.classList.toggle('active', currentLang === 'RU');
 
     // 1. PAVÉ 1 : Rendu Landing
     renderLanding();
 
-    // 2. PAVÉ 3 : Featured Drop
     const featTitle = document.getElementById('featured-track-title');
     if (featTitle) featTitle.innerText = parsedConfig.FEATURED?.track || "";
 
@@ -82,11 +87,13 @@ function processConfig(text) {
             featBox.style.backgroundPosition = 'center';
         }
     }
-// Injection de la date Pavé 3
-const featDateElem = document.getElementById('featured-date');
-if (featDateElem) {
-    featDateElem.innerText = parsedConfig.FEATURED?.date ? `[ ${parsedConfig.FEATURED.date} ]` : "";
-}
+
+    // Injection de la date Pavé 3
+    const featDateElem = document.getElementById('featured-date');
+    if (featDateElem) {
+        featDateElem.innerText = parsedConfig.FEATURED?.date ? `[ ${parsedConfig.FEATURED.date} ]` : "";
+    }
+
     // Initialisation du lecteur Pavé 3
     const featuredTrack = parsedConfig.FEATURED?.track;
     if (featuredTrack) {
@@ -98,6 +105,11 @@ if (featDateElem) {
             document.body.appendChild(audio);
         }
         audio.src = `audio/${featuredTrack}.m4a`;
+        audio.play().catch(() => {
+            // Le navigateur bloque l'autoplay non sollicité, c'est normal.
+            // Le player sera prêt et se lancera au premier clic de l'utilisateur.
+            console.log("Autoplay en attente d'interaction utilisateur.");
+        });
 
         const playBtn = document.getElementById('feat-play');
         const rewindBtn = document.getElementById('feat-rewind');
@@ -121,9 +133,14 @@ if (featDateElem) {
         if (forwardBtn) forwardBtn.onclick = () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
 
         if (loopBtn) {
+            const savedLoop = localStorage.getItem('audioLoop') === 'true';
+            audio.loop = savedLoop;
+            loopBtn.classList.toggle('active', audio.loop);
+
             loopBtn.onclick = () => {
                 audio.loop = !audio.loop;
                 loopBtn.classList.toggle('active', audio.loop);
+                localStorage.setItem('audioLoop', audio.loop);
             };
         }
 
@@ -137,8 +154,13 @@ if (featDateElem) {
         }
 
         if (volumeBar) {
-            audio.volume = parseFloat(volumeBar.value) || 0.8;
-            volumeBar.oninput = () => audio.volume = parseFloat(volumeBar.value);
+            const savedVolume = localStorage.getItem('audioVolume');
+            audio.volume = savedVolume ? parseFloat(savedVolume) : (parseFloat(volumeBar.value) || 0.8);
+            volumeBar.value = audio.volume;
+            volumeBar.oninput = () => {
+                audio.volume = parseFloat(volumeBar.value);
+                localStorage.setItem('audioVolume', audio.volume);
+            };
         }
     }
 
@@ -167,10 +189,10 @@ if (featDateElem) {
     }
 }
 
-// --- GESTION DE LA LANGUE ET DU PAVÉ 1 ---
 function switchLanguage(lang) {
     if (currentLang === lang) return;
     currentLang = lang;
+    localStorage.setItem('userLang', lang);
 
     const btnEn = document.getElementById('btn-lang-en');
     const btnRu = document.getElementById('btn-lang-ru');
@@ -178,6 +200,7 @@ function switchLanguage(lang) {
     if (btnRu) btnRu.classList.toggle('active', lang === 'RU');
 
     renderLanding();
+    if (typeof updateRadioPassiveUI === 'function') updateRadioPassiveUI();
 }
 
 function renderLanding() {
@@ -188,7 +211,13 @@ function renderLanding() {
     const configLanding = { ...baseData, ...langData };
 
     document.getElementById('landing-title').innerText = configLanding.title || "VIRA404";
-    document.getElementById('landing-subtitle').innerText = configLanding.subtitle || "";
+    let subtitleText = configLanding.subtitle || "";
+    subtitleText = subtitleText.replace(
+        "NoCodeGirl", 
+        `<span style="color: var(--accent-fuchsia);">No</span><span style="color: var(--accent-teal);">Code</span><span style="color: var(--accent-fuchsia);">Girl</span>`
+    );
+
+    document.getElementById('landing-subtitle').innerHTML = subtitleText;
     document.getElementById('landing-caption1').innerText = configLanding.caption1 || "";
     document.getElementById('landing-caption2').innerText = configLanding.caption2 || "";
     document.getElementById('landing-caption3').innerText = configLanding.caption3 || "";
@@ -208,9 +237,7 @@ function renderLanding() {
                 a.className = 'social-btn';
                 a.target = "_blank";
 
-                // Récupération du 1er caractère ou émoji
                 const firstChar = Array.from(textLink)[0] || '🔗';
-
                 const iconContainer = document.createElement('span');
                 iconContainer.className = 'social-icon';
 
@@ -218,8 +245,8 @@ function renderLanding() {
                 img.src = `assets/link${i}.svg`;
                 img.alt = textLink;
 
-                // Si l'image SVG n'existe pas dans assets/, fallback sur le 1er caractère
-                img.onerror = () => {
+                img.onerror = function() {
+                    this.onerror = null;
                     iconContainer.innerText = firstChar;
                 };
 
@@ -271,10 +298,310 @@ function parseConfigTxt(text) {
     return data;
 }
 
-// --- TRAITEMENT CATALOGUE ---
+// --- PAVÉ 2 (RADIO - CORRIGÉ) ---
 function processCatalogue(text) {
-    const tracks = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
-    console.log(`Catalogue chargé : ${tracks.length} morceaux.`);
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    
+    let tempTracks = [];
+    
+    for (let line of lines) {
+        const parsed = parseCatalogueLine(line);
+        if (parsed) {
+            tempTracks.push(parsed);
+        }
+    }
+
+    // Calcul dynamique des endSec (le endSec d'une piste est le startSec de la suivante)
+    catalogueTracks = tempTracks.map((track, index) => {
+        let endSec;
+        if (index < tempTracks.length - 1) {
+            endSec = tempTracks[index + 1].startSec;
+        } else {
+            endSec = track.startSec + track.durationSec;
+        }
+        return { ...track, endSec };
+    });
+
+    if (catalogueTracks.length === 0) return;
+
+    totalRadioDuration = catalogueTracks[catalogueTracks.length - 1].endSec;
+
+    initRadioControls();
+    updateRadioPassiveUI();
+
+    if (radioInterval) clearInterval(radioInterval);
+    radioInterval = setInterval(updateRadioPassiveUI, 1000);
+}
+
+function parseTimeToSec(str) {
+    if (!str) return 0;
+    const parts = str.split(':').map(Number);
+    if (parts.length === 3) return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+    if (parts.length === 2) return (parts[0] * 60) + parts[1];
+    return 0;
+}
+
+function parseCatalogueLine(line) {
+    // Découpage selon ton format réel : "00:00:00 / Titre / Album / Année / Durée"
+    const parts = line.split(' / ').map(p => p.trim());
+    if (parts.length < 2) return null;
+
+    const startStr = parts[0];
+    const rightSide = parts[1];
+    const subParts = rightSide.split('/').map(p => p.trim());
+    
+    if (subParts.length < 4) return null;
+
+    const fullName = subParts[0];
+    const album = subParts[1];
+    const year = subParts[2];
+    const durStr = subParts[3];
+
+    const startSec = parseTimeToSec(startStr);
+    const durationSec = parseTimeToSec(durStr);
+
+    const trackMatch = fullName.match(/^(\d{2})-/);
+    const trackNum = trackMatch ? trackMatch[1] : null;
+
+    let cleanTitle = fullName.replace(/^\d{2}-/, '').split('—')[0].trim();
+    cleanTitle = cleanTitle.replace(/\[.*?\]/g, '').trim();
+
+    const isSingle = !album || album.toLowerCase() === 'single';
+
+    return {
+        startSec,
+        durationSec,
+        fullName,
+        cleanTitle,
+        trackNum,
+        album: isSingle ? null : album,
+        year,
+        isSingle
+    };
+}
+
+function getLiveRadioState() {
+    if (!catalogueTracks.length || !totalRadioDuration) return null;
+    const nowSec = Math.floor(Date.now() / 1000);
+    const loopSec = nowSec % totalRadioDuration;
+
+    let index = catalogueTracks.findIndex(t => loopSec >= t.startSec && loopSec < t.endSec);
+    if (index === -1) index = 0;
+
+    const track = catalogueTracks[index];
+    const offset = loopSec - track.startSec;
+    const remaining = track.endSec - loopSec;
+
+    return { trackIndex: index, track, offset, remaining };
+}
+
+function updateRadioPassiveUI() {
+    const state = getLiveRadioState();
+    if (!state) return;
+
+    const { trackIndex, track, offset } = state;
+
+    if (trackIndex !== currentRadioTrackIndex) {
+        currentRadioTrackIndex = trackIndex;
+
+        const titleElem = document.getElementById('radio-track-title');
+        if (titleElem) titleElem.innerText = track.cleanTitle;
+
+        const infoElem = document.getElementById('radio-track-info');
+        if (infoElem) {
+            const trackPrefix = currentLang === 'RU' ? 'трек' : 'Track';
+            if (track.trackNum && !track.isSingle) {
+                infoElem.innerText = `${trackPrefix} ${track.trackNum}, ${track.year}`;
+            } else {
+                infoElem.innerText = track.year;
+            }
+        }
+
+        const albumElem = document.getElementById('radio-album-name');
+        if (albumElem) {
+            albumElem.innerText = track.isSingle ? 'Single' : track.album;
+        }
+
+        const downloadBtn = document.getElementById('radio-download-btn');
+        if (downloadBtn) {
+            downloadBtn.href = `audio/${track.fullName}.m4a`;
+        }
+
+        const coverImg = document.getElementById('radio-cover-img');
+        if (coverImg) {
+            coverImg.onerror = function() {
+                this.onerror = null;
+                this.src = 'covers/cover_default.webp';
+            };
+            coverImg.src = `covers/${track.fullName}.webp`;
+        }
+
+        const albumImg = document.getElementById('radio-album-img');
+        if (albumImg) {
+            albumImg.onerror = function() {
+                this.onerror = null;
+                this.src = 'assets/artworks/default.webp';
+            };
+            if (track.isSingle) {
+                albumImg.src = 'assets/artworks/default.webp';
+            } else {
+                albumImg.src = `assets/artworks/${track.album}.webp`;
+            }
+        }
+
+        loadRadioLyrics(track.fullName);
+    }
+
+    const radioAudio = document.getElementById('radio-audio');
+    const activeTime = (radioAudio && !radioAudio.paused) ? radioAudio.currentTime : offset;
+    syncRadioLyrics(activeTime);
+}
+
+function initRadioControls() {
+    let audio = document.getElementById('radio-audio');
+    if (!audio) {
+        audio = document.createElement('audio');
+        audio.id = 'radio-audio';
+        audio.preload = 'none';
+        document.body.appendChild(audio);
+    }
+
+    const playBtn = document.getElementById('radio-toggle-btn') || 
+                    document.getElementById('radio-play-btn') || 
+                    document.querySelector('#pave-radio .play-btn') ||
+                    document.querySelector('#pave-radio button');
+
+    if (playBtn) {
+        playBtn.onclick = (e) => {
+            e.preventDefault();
+            if (audio.paused) {
+                startRadioAudio();
+            } else {
+                stopRadioAudio();
+            }
+        };
+    }
+
+    audio.onended = () => {
+        startRadioAudio();
+    };
+}
+
+function startRadioAudio() {
+    const audio = document.getElementById('radio-audio');
+    const playBtn = document.getElementById('radio-toggle-btn') || 
+                    document.getElementById('radio-play-btn') || 
+                    document.querySelector('#pave-radio .play-btn') ||
+                    document.querySelector('#pave-radio button');
+    
+    const badgeOnAir = document.getElementById('radio-badge') || document.querySelector('.live-badge');
+    const state = getLiveRadioState();
+
+    if (!audio || !state) return;
+
+    const featAudio = document.getElementById('featured-audio');
+    if (featAudio && !featAudio.paused) {
+        featAudio.pause();
+    }
+
+    audio.src = `audio/${state.track.fullName}.m4a`;
+    audio.currentTime = state.offset;
+
+    audio.onerror = function() {
+        if (this.src.endsWith('.m4a')) {
+            this.src = `audio/${state.track.fullName}.mp3`;
+            this.play().catch(() => {});
+        }
+    };
+
+    audio.play().then(() => {
+        if (playBtn) playBtn.classList.add('playing');
+        if (badgeOnAir) badgeOnAir.classList.add('active');
+    }).catch(err => {
+        console.log("Lecture audio radio bloquée ou erreur :", err);
+    });
+}
+
+function stopRadioAudio() {
+    const audio = document.getElementById('radio-audio');
+    const playBtn = document.getElementById('radio-toggle-btn') || 
+                    document.getElementById('radio-play-btn') || 
+                    document.querySelector('#pave-radio .play-btn') ||
+                    document.querySelector('#pave-radio button');
+    const badgeOnAir = document.getElementById('radio-badge') || document.querySelector('.live-badge');
+
+    if (audio) audio.pause();
+    if (playBtn) playBtn.classList.remove('playing');
+    if (badgeOnAir) badgeOnAir.classList.remove('active');
+}
+
+function loadRadioLyrics(trackName) {
+    const srtPath = `lyrics/${trackName}.srt`;
+    fetch(srtPath)
+        .then(res => {
+            if (!res.ok) throw new Error("Fichier SRT introuvable");
+            return res.text();
+        })
+        .then(text => {
+            radioSrtData = parseSRT(text);
+        })
+        .catch(() => {
+            radioSrtData = [];
+            const container = document.getElementById('radio-lyrics-container');
+            if (container) container.innerHTML = '<span class="no-lyrics">---</span>';
+        });
+}
+
+function parseSRT(data) {
+    const subtitles = [];
+    const blocks = data.replace(/\r/g, '').split('\n\n');
+
+    for (let block of blocks) {
+        const lines = block.split('\n');
+        if (lines.length >= 3) {
+            const timeLine = lines[1];
+            const textLines = lines.slice(2).join('<br>');
+            const times = timeLine.split(' --> ');
+
+            if (times.length === 2) {
+                const startSec = parseSrtTime(times[0]);
+                const endSec = parseSrtTime(times[1]);
+                subtitles.push({ startSec, endSec, text: textLines });
+            }
+        }
+    }
+    return subtitles;
+}
+
+function parseSrtTime(timeStr) {
+    const parts = timeStr.split(':');
+    if (parts.length < 3) return 0;
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    const secParts = parts[2].split(',');
+    const seconds = parseInt(secParts[0], 10);
+    const milliseconds = parseInt(secParts[1] || 0, 10);
+    return (hours * 3600) + (minutes * 60) + seconds + (milliseconds / 1000);
+}
+
+function syncRadioLyrics(currentTime) {
+    const container = document.getElementById('radio-lyrics-container');
+    if (!container) return;
+
+    if (!radioSrtData.length) {
+        container.innerHTML = '<span class="no-lyrics">...</span>';
+        return;
+    }
+
+    const currentSub = radioSrtData.find(sub => currentTime >= sub.startSec && currentTime <= sub.endSec);
+
+    if (currentSub) {
+        if (container.innerHTML !== currentSub.text) {
+            container.innerHTML = currentSub.text;
+        }
+    } else {
+        container.innerHTML = '<span class="no-lyrics">...</span>';
+    }
 }
 
 // --- COMPTE À REBOURS DYNAMIQUE ---
@@ -339,3 +666,16 @@ function initCountdown(dateString) {
     updateTimer();
     setInterval(updateTimer, 1000);
 }
+
+// Défilement horizontal à la molette de souris sur PC
+document.addEventListener("DOMContentLoaded", () => {
+    const gridContainer = document.querySelector('.grid-container');
+    if (gridContainer) {
+        gridContainer.addEventListener('wheel', (evt) => {
+            if (gridContainer.scrollWidth > gridContainer.clientWidth) {
+                evt.preventDefault();
+                gridContainer.scrollLeft += evt.deltaY;
+            }
+        }, { passive: false });
+    }
+});
