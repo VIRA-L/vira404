@@ -224,14 +224,27 @@ html, body {
 .social-grid .social-btn:nth-child(3) { border-color: var(--accent-fuchsia); }
 .social-grid .social-btn:nth-child(4) { border-color: var(--warning-yellow); }
 
+CSS
 /* --- PAVÉ 2 : SPECIFIQUE LIVE RADIO & PAROLES KARAOKÉ --- */
 #pave-radio .pave-content {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 25px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    padding: 25px 20px;
+}
+
+#pave-radio .pave-header {
+    position: absolute !important;
+    top: 25px !important;
+    left: 20px !important;
+    right: 20px !important;
+    z-index: 3;
+    text-align: left;
 }
 
 #radio-badge {
@@ -253,20 +266,35 @@ html, body {
     box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
 }
 
-#radio-lyrics-box {
-    width: 100%;
-    max-height: 220px;
-    overflow-y: hidden;
-    margin: 15px 0;
-    padding: 10px;
+/* Fenêtre de paroles avec marge de sécurité en bas pour éviter que le texte ne touche le cadre */
+#radio-lyrics-container {
+    position: absolute !important;
+    top: 100px !important;
+    bottom: 250px !important; /* Laisse un espace bien large en bas */
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    padding: 15px 20px;
+    text-align: center;
+    box-sizing: border-box;
+    
+    background-color: rgba(10, 10, 10, 0.75);
+    border: 2px solid var(--accent-fuchsia);
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(163, 53, 171, 0.15);
+
     scrollbar-width: thin;
     scrollbar-color: var(--accent-teal) transparent;
+    z-index: 1;
 }
 
 .srt-line {
     font-size: 0.95rem;
     color: var(--accent-fuchsia);
-    margin: 8px 0;
+    margin: 12px 0;
     transition: color 0.3s ease, font-size 0.3s ease, transform 0.3s ease;
 }
 
@@ -276,54 +304,107 @@ html, body {
     font-size: 1.05rem;
 }
 
-.radio-meta-grid {
+#pave-radio .pave-footer {
+    position: absolute !important;
+    bottom: 15px !important;
+    left: 20px !important;
+    right: 20px !important;
+    z-index: 2;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    width: 100%;
-    margin-bottom: 12px;
+    align-items: center;
+}
+
+/* Grille des métadonnées proprement séparée Gauche / Droite */
+.radio-meta-grid {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    width: 85% !important;
+    margin-bottom: 8px !important;
+}
+
+.radio-meta-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    max-width: 60%;
+}
+
+.radio-meta-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    max-width: 35%;
 }
 
 #radio-track-title {
     font-size: 1rem;
     font-weight: 800;
     color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 0 2px 0 !important;
+    text-align: left !important;
 }
 
-#radio-track-info, #radio-album-name {
-    font-size: 0.8rem;
+#radio-track-info {
+    font-size: 0.75rem;
     color: var(--text-muted);
+    text-align: left !important;
+    margin: 0 !important;
 }
 
+#radio-album-name {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: right !important;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 !important;
+}
+
+/* Grille 1x3 : Poches grossies et bien centrées */
 .radio-controls-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
+    display: grid !important;
+    grid-template-columns: 125px 1fr 125px !important;
+    gap: 15px !important;
+    align-items: center !important;
+    justify-items: center !important;
+    width: 85% !important;
+    margin: 0 auto !important;
 }
 
 .radio-cover-thumb {
-    width: 50px;
-    height: 50px;
-    border-radius: 6px;
-    object-fit: cover;
-    border: 1px solid var(--border-card);
+    width: 125px !important;
+    height: 125px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 14px !important;
+    object-fit: cover !important;
+    border: 2px solid var(--border-card) !important;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
 }
 
 #radio-toggle-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--accent-fuchsia);
-    border: none;
-    color: #ffffff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background 0.2s;
+    width: 75px !important;
+    height: 75px !important;
+    border-radius: 50% !important;
+    background: var(--accent-fuchsia) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-size: 1.8rem !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.2s, background 0.2s !important;
+    box-shadow: 0 0 20px rgba(163, 53, 171, 0.4);
 }
 
 #radio-toggle-btn:hover {
@@ -452,5 +533,54 @@ html, body {
         width: 80%;
         margin-left: auto;
         margin-right: auto;
+    }
+}
+
+/* Calque du mini-jeu confiné dans le Pavé 2 */
+#retro-game-layer {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Laisse passer les clics par défaut */
+    z-index: 5;
+    overflow: hidden;
+}
+
+/* La raquette placée dans l'espace vide entre les paroles et les métadonnées */
+#retro-paddle {
+    position: absolute !important;
+    bottom: 215px !important; /* Ajusté juste au-dessus des métadonnées */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 20px;
+    background: var(--accent-teal) !important;
+    border: 1px solid var(--accent-fuchsia);
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--accent-teal);
+    pointer-events: auto; /* Permet de cliquer dessus */
+    cursor: pointer;
+}
+
+/* Style des emojis tirés qui montent vers le haut du pavé */
+.retro-bullet {
+    position: absolute;
+    font-size: 1.4rem;
+    animation: shootUpInside 1.2s linear forwards;
+    pointer-events: none;
+    user-select: none;
+    z-index: 6;
+}
+
+@keyframes shootUpInside {
+    0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-650px) scale(1.2); /* Monte à travers l'écran */
+        opacity: 0;
     }
 }

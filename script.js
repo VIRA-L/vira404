@@ -123,8 +123,12 @@ function processConfig(text) {
                 if (audio.paused) {
                     document.querySelectorAll('audio').forEach(a => { if (a !== audio) a.pause(); });
                     audio.play();
+                    // Ancienne version : (rien)
+                    localStorage.setItem('activePlayer', 'featured'); // ajout sauvegarde statut featured
                 } else {
                     audio.pause();
+                    // Ancienne version : (rien)
+                    localStorage.removeItem('activePlayer'); // ajout suppression statut featured
                 }
             };
         }
@@ -158,8 +162,11 @@ function processConfig(text) {
             audio.volume = savedVolume ? parseFloat(savedVolume) : (parseFloat(volumeBar.value) || 0.8);
             volumeBar.value = audio.volume;
             volumeBar.oninput = () => {
-                audio.volume = parseFloat(volumeBar.value);
-                localStorage.setItem('audioVolume', audio.volume);
+                // Ancienne version : audio.volume = parseFloat(volumeBar.value); localStorage.setItem('audioVolume', audio.volume);
+                audio.volume = parseFloat(volumeBar.value); // nouvelle version
+                const radioAudio = document.getElementById('radio-audio'); // nouvelle version
+                if (radioAudio) radioAudio.volume = audio.volume; // nouvelle version
+                localStorage.setItem('audioVolume', audio.volume); // nouvelle version
             };
         }
     }
@@ -431,7 +438,8 @@ function updateRadioPassiveUI() {
         if (coverImg) {
             coverImg.onerror = function() {
                 this.onerror = null;
-                this.src = 'covers/cover_default.webp';
+                // Ancienne version : this.src = 'covers/cover_default.webp';
+                this.src = 'covers/_track-nocode.webp'; // nouvelle version
             };
             coverImg.src = `covers/${track.fullName}.webp`;
         }
@@ -440,12 +448,14 @@ function updateRadioPassiveUI() {
         if (albumImg) {
             albumImg.onerror = function() {
                 this.onerror = null;
-                this.src = 'assets/artworks/default.webp';
+                // Ancienne version : this.src = 'assets/artworks/default.webp';
+                this.src = 'covers/_album-nocode.webp'; // nouvelle version
             };
             if (track.isSingle) {
-                albumImg.src = 'assets/artworks/default.webp';
+                // Ancienne version : albumImg.src = 'assets/artworks/default.webp';
+                albumImg.src = 'covers/_album-nocode.webp'; // nouvelle version
             } else {
-                albumImg.src = `assets/artworks/${track.album}.webp`;
+                albumImg.src = `covers/00-${track.album}.webp`; // nouvelle version
             }
         }
 
@@ -504,7 +514,9 @@ function startRadioAudio() {
         featAudio.pause();
     }
 
-    audio.src = `audio/${state.track.fullName}.m4a`;
+    // Ancienne version : audio.src = `audio/${state.track.fullName}.m4a`;
+    audio.src = `audio/${state.track.fullName}.m4a`; // nouvelle version
+    audio.volume = localStorage.getItem('audioVolume') ? parseFloat(localStorage.getItem('audioVolume')) : 0.8; // nouvelle version
     audio.currentTime = state.offset;
 
     audio.onerror = function() {
@@ -517,6 +529,8 @@ function startRadioAudio() {
     audio.play().then(() => {
         if (playBtn) playBtn.classList.add('playing');
         if (badgeOnAir) badgeOnAir.classList.add('active');
+        // Ancienne version : (rien)
+        localStorage.setItem('activePlayer', 'radio'); // ajout sauvegarde statut radio
     }).catch(err => {
         console.log("Lecture audio radio bloquée ou erreur :", err);
     });
@@ -533,20 +547,47 @@ function stopRadioAudio() {
     if (audio) audio.pause();
     if (playBtn) playBtn.classList.remove('playing');
     if (badgeOnAir) badgeOnAir.classList.remove('active');
+    // Ancienne version : (rien)
+    localStorage.removeItem('activePlayer'); // ajout suppression statut radio
 }
 
 function loadRadioLyrics(trackName) {
     const srtPath = `lyrics/${trackName}.srt`;
+    
+    // 1. On essaie d'abord le fichier .srt (avec timestamps)
     fetch(srtPath)
         .then(res => {
-            if (!res.ok) throw new Error("Fichier SRT introuvable");
+            if (!res.ok) throw new Error("SRT introuvable");
             return res.text();
         })
         .then(text => {
             radioSrtData = parseSRT(text);
         })
         .catch(() => {
-            radioSrtData = [];
+            // 2. Si pas de SRT, on essaie le .txt de la piste (paroles brutes)
+            return fetch(`lyrics/${trackName}.txt`)
+                .then(res => {
+                    if (!res.ok) throw new Error("TXT introuvable");
+                    return res.text();
+                })
+                .then(text => {
+                    // C'est un simple TXT sans timestamps : on l'affiche en bloc unique permanent
+                    radioSrtData = [{ startSec: 0, endSec: 999999, text: text.trim().replace(/\n/g, '<br>') }];
+                })
+                .catch(() => {
+                    // 3. Dernier recours : le fichier global _lyrics-nocode.txt
+                    return fetch('lyrics/_lyrics-nocode.txt')
+                        .then(res => {
+                            if (!res.ok) throw new Error("Secours introuvable");
+                            return res.text();
+                        })
+                        .then(text => {
+                            radioSrtData = [{ startSec: 0, endSec: 999999, text: text.trim().replace(/\n/g, '<br>') }];
+                        });
+                });
+        })
+        .catch(() => {
+            radioSrtData = [{ startSec: 0, endSec: 999999, text: "---" }];
             const container = document.getElementById('radio-lyrics-container');
             if (container) container.innerHTML = '<span class="no-lyrics">---</span>';
         });
@@ -678,4 +719,103 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }, { passive: false });
     }
+});
+
+// Ancienne version : (rien)
+window.addEventListener('DOMContentLoaded', () => { // ajout écouteur de rechargement
+    const lastPlayer = localStorage.getItem('activePlayer'); // ajout récupération dernier lecteur actif
+    if (lastPlayer === 'radio') { // ajout condition pour relancer la radio si elle était active
+        setTimeout(() => { // ajout délai pour laisser le catalogue s'initialiser
+            if (typeof startRadioAudio === 'function') { // ajout vérification de l'existence de la fonction
+                startRadioAudio(); // ajout relance automatique de la radio
+            } // ajout fin if fonction
+        }, 500); // ajout délai de 500ms
+    } // ajout fin if lastPlayer
+}); // ajout fin écouteur rechargement
+
+document.addEventListener('DOMContentLoaded', () => {
+    const layer = document.getElementById('retro-game-layer');
+    const paddle = document.getElementById('retro-paddle');
+    
+    if (!paddle || !layer) return;
+
+    // Liste des symboles validés
+    const emojis = ['🚀', '🔥', '☣️', '👎', '⚡', '🧬', '💔', '🧲', '🐧', '⏳'];
+
+    // Animation de va-et-vient dans les limites du conteneur parent
+    let posX = layer.clientWidth / 2;
+    let direction = 2; // Vitesse de déplacement
+
+    function movePaddle() {
+        const parentWidth = layer.clientWidth;
+        const paddleWidth = paddle.offsetWidth;
+        
+        posX += direction;
+
+        if (posX - paddleWidth / 2 <= 0 || posX + paddleWidth / 2 >= parentWidth) {
+            direction *= -1;
+        }
+
+        paddle.style.left = posX + 'px';
+        requestAnimationFrame(movePaddle);
+    }
+    requestAnimationFrame(movePaddle);
+
+    // Fonction de tir unique
+    function shootEmoji() {
+        const bullet = document.createElement('div');
+        bullet.className = 'retro-bullet';
+        bullet.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        
+        const paddleRect = paddle.getBoundingClientRect();
+        const layerRect = layer.getBoundingClientRect();
+        
+        const relativeLeft = (paddleRect.left - layerRect.left) + (paddleRect.width / 2) + (Math.random() * 40 - 20);
+        
+        bullet.style.left = relativeLeft + 'px';
+        bullet.style.bottom = '230px'; 
+        
+        layer.appendChild(bullet);
+
+        setTimeout(() => {
+            bullet.remove();
+        }, 1200);
+    }
+
+    let fireInterval = null;
+
+    // Démarrer la rafale au clic enfoncé
+    paddle.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        if (fireInterval) return;
+        
+        shootEmoji();
+        fireInterval = setInterval(shootEmoji, 120);
+        
+        paddle.style.boxShadow = '0 0 20px #ff3333';
+        paddle.style.borderColor = '#ff3333';
+    });
+
+    // Arrêter la rafale quand on relève la souris ou qu'on sort de la raquette
+    const stopFiring = () => {
+        if (fireInterval) {
+            clearInterval(fireInterval);
+            fireInterval = null;
+            paddle.style.boxShadow = '0 0 10px var(--accent-teal)';
+            paddle.style.borderColor = 'var(--accent-fuchsia)';
+        }
+    };
+
+    paddle.addEventListener('mouseup', stopFiring);
+    paddle.addEventListener('mouseleave', stopFiring);
+
+    // Support tactile simple sans bloquer la page
+    paddle.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+        if (fireInterval) return;
+        shootEmoji();
+        fireInterval = setInterval(shootEmoji, 120);
+    });
+
+    paddle.addEventListener('touchend', stopFiring);
 });

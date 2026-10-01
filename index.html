@@ -32,33 +32,45 @@
         </section>
 
         <!-- PAVÉ 2 : Live Radio -->
-        <section class="pave pave-2" id="pave-radio">
-            <div class="pave-content">
-                <div class="pave-header">
-                    <h3>LIVE RADIO</h3>
-                    <span id="radio-badge" class="live-badge is-off">OFF AIR</span>
+<section class="pave pave-2" id="pave-radio">
+    <div class="pave-content">
+        <!-- Calque du mini-jeu spécifique au Pavé 2 -->
+        <div id="retro-game-layer">
+            <div id="retro-paddle"></div>
+        </div>
+
+        <!-- 1. Le Header en haut -->
+        <div class="pave-header">
+            <h3>LIVE RADIO</h3>
+            <span id="radio-badge" class="live-badge is-off">OFF AIR</span>
+        </div>
+
+        <!-- 2. Le conteneur de paroles au milieu -->
+        <div id="radio-lyrics-container" class="radio-lyrics">---</div>
+        <a id="radio-download-btn" style="display:none;" href="" download></a>
+
+        <!-- 3. Le footer en bas -->
+        <div class="pave-footer">
+            <div class="radio-meta-grid">
+                <div class="radio-meta-left">
+                    <h4 id="radio-track-title"></h4>
+                    <p id="radio-track-info"></p>
                 </div>
-
-                <div class="pave-footer">
-                    <div class="radio-meta-grid">
-                        <h4 id="radio-track-title"></h4>
-                        <p id="radio-track-info"></p>
-                        <p id="radio-album-name"></p>
-                    </div>
-                    
-                    <div id="radio-lyrics-container" class="radio-lyrics">---</div>
-                    <a id="radio-download-btn" style="display:none;" href="" download></a>
-
-                    <div class="radio-controls-row">
-                        <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Cover Morceau" />
-                        <button id="radio-toggle-btn" class="btn-ctrl" title="Lecture / Pause">▶</button>
-                        <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Cover Album" />
-                    </div>
+                <div class="radio-meta-right">
+                    <p id="radio-album-name"></p>
                 </div>
-
-                <audio id="radio-audio" preload="none"></audio>
             </div>
-        </section>
+
+            <div class="radio-controls-row">
+                <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Cover Morceau" />
+                <button id="radio-toggle-btn" class="btn-ctrl" title="Lecture / Pause">▶</button>
+                <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Cover Album" />
+            </div>
+        </div>
+
+        <audio id="radio-audio" preload="none"></audio>
+    </div>
+</section>
 
         <!-- PAVÉ 3 : Featured Drop -->
         <section class="pave pave-3" id="pave-featured">
