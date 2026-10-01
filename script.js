@@ -439,7 +439,7 @@ function updateRadioPassiveUI() {
             coverImg.onerror = function() {
                 this.onerror = null;
                 // Ancienne version : this.src = 'covers/cover_default.webp';
-                this.src = 'covers/_track-nocode.webp'; // nouvelle version
+                this.src = 'covers/00a-track-nocode.webp'; // nouvelle version
             };
             coverImg.src = `covers/${track.fullName}.webp`;
         }
@@ -449,11 +449,11 @@ function updateRadioPassiveUI() {
             albumImg.onerror = function() {
                 this.onerror = null;
                 // Ancienne version : this.src = 'assets/artworks/default.webp';
-                this.src = 'covers/_album-nocode.webp'; // nouvelle version
+                this.src = 'covers/00a-album-nocode.webp'; // nouvelle version
             };
             if (track.isSingle) {
                 // Ancienne version : albumImg.src = 'assets/artworks/default.webp';
-                albumImg.src = 'covers/_album-nocode.webp'; // nouvelle version
+                albumImg.src = 'covers/00a-album-nocode.webp'; // nouvelle version
             } else {
                 albumImg.src = `covers/00-${track.album}.webp`; // nouvelle version
             }
@@ -575,8 +575,8 @@ function loadRadioLyrics(trackName) {
                     radioSrtData = [{ startSec: 0, endSec: 999999, text: text.trim().replace(/\n/g, '<br>') }];
                 })
                 .catch(() => {
-                    // 3. Dernier recours : le fichier global _lyrics-nocode.txt
-                    return fetch('lyrics/_lyrics-nocode.txt')
+                    // 3. Dernier recours : le fichier global 00a-lyrics-nocode.txt
+                    return fetch('lyrics/00a-lyrics-nocode.txt')
                         .then(res => {
                             if (!res.ok) throw new Error("Secours introuvable");
                             return res.text();
