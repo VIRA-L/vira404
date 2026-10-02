@@ -1,0 +1,336 @@
+﻿1
+00:00:00,500 --> 00:00:02,500
+Priority boarding.
+2
+00:00:02,600 --> 00:00:04,000
+Of course.
+3
+00:00:06,200 --> 00:00:07,800
+Of course.
+4
+00:00:20,000 --> 00:00:21,800
+Priority boarding.
+5
+00:00:22,000 --> 00:00:23,200
+Of course.
+6
+00:00:23,500 --> 00:00:25,500
+Your name clears security
+7
+00:00:25,600 --> 00:00:27,500
+Before you show your face
+8
+00:00:27,600 --> 00:00:29,200
+Someone knows somebody
+9
+00:00:29,300 --> 00:00:30,800
+Someone saves your place
+10
+00:00:31,000 --> 00:00:32,800
+You walk into the lounge
+11
+00:00:32,900 --> 00:00:34,500
+Like you discovered flight
+12
+00:00:34,600 --> 00:00:36,200
+They hand you gate and runway
+13
+00:00:36,300 --> 00:00:37,800
+Then praise your fearless climb
+14
+00:00:38,000 --> 00:00:39,800
+You never missed a meeting
+15
+00:00:40,000 --> 00:00:41,500
+You never missed a call
+16
+00:00:41,600 --> 00:00:43,200
+Funny how the right last name
+17
+00:00:43,300 --> 00:00:44,500
+Makes doors forget the wall
+18
+00:00:44,600 --> 00:00:46,200
+You never skipped the line
+19
+00:00:46,300 --> 00:00:47,800
+There was no line for you
+20
+00:00:48,000 --> 00:00:49,800
+They cleared the whole damn runway
+21
+00:00:50,000 --> 00:00:51,800
+Then called the takeoff you
+22
+00:00:52,000 --> 00:00:53,400
+FAST TRACK
+23
+00:00:53,000 --> 00:00:54,000
+— priority name
+24
+00:00:54,000 --> 00:00:55,200
+FAST TRACK
+25
+00:00:54,800 --> 00:00:56,000
+— same old game
+26
+00:00:56,000 --> 00:00:57,200
+FAST TRACK
+27
+00:00:57,000 --> 00:00:58,000
+— wave your pass
+28
+00:00:58,000 --> 00:00:59,000
+Tell us how you made it fast
+29
+00:00:59,000 --> 00:01:00,200
+FAST TRACK
+30
+00:00:59,800 --> 00:01:01,000
+— perfect start
+31
+00:01:01,000 --> 00:01:02,200
+FAST TRACK
+32
+00:01:02,000 --> 00:01:03,400
+— play the part
+33
+00:01:03,400 --> 00:01:04,600
+Smile and tell the camera how
+34
+00:01:04,600 --> 00:01:05,800
+You earned what you were handed out
+35
+00:01:16,200 --> 00:01:18,000
+Manager calls publicist
+36
+00:01:18,200 --> 00:01:20,000
+Publicist calls press
+37
+00:01:20,100 --> 00:01:22,000
+Press calls you the next big thing
+38
+00:01:22,100 --> 00:01:23,300
+Before you’ve made a mess
+39
+00:01:23,400 --> 00:01:25,500
+Showcase full of friendly eyes
+40
+00:01:25,600 --> 00:01:27,200
+Playlist locked by noon
+41
+00:01:27,300 --> 00:01:28,800
+Three manufactured quotes
+42
+00:01:28,900 --> 00:01:30,800
+And suddenly you’re “breaking through”
+43
+00:01:31,000 --> 00:01:32,400
+First they build the staircase
+44
+00:01:32,500 --> 00:01:33,800
+Then hide it from the shot
+45
+00:01:33,900 --> 00:01:35,500
+Sell the story: self-made kid
+46
+00:01:35,600 --> 00:01:36,900
+Who fought for every spot
+47
+00:01:37,000 --> 00:01:38,800
+You pay your dues at lunch
+48
+00:01:38,900 --> 00:01:40,300
+On someone else’s card
+49
+00:01:40,400 --> 00:01:42,200
+Then give a fucking interview
+50
+00:01:42,300 --> 00:01:43,800
+About working twice as hard
+51
+00:01:44,000 --> 00:01:45,500
+You never skipped the line
+52
+00:01:45,600 --> 00:01:47,100
+There was no line for you
+53
+00:01:47,200 --> 00:01:49,500
+They cleared the whole damn runway
+54
+00:01:49,600 --> 00:01:51,000
+Then called the takeoff you
+55
+00:01:51,000 --> 00:01:52,400
+FAST TRACK
+56
+00:01:52,000 --> 00:01:53,000
+— priority name
+57
+00:01:53,000 --> 00:01:54,400
+FAST TRACK
+58
+00:01:53,900 --> 00:01:55,000
+— same old game
+59
+00:01:55,000 --> 00:01:56,400
+FAST TRACK
+60
+00:01:56,000 --> 00:01:57,200
+— wave your pass
+61
+00:01:57,200 --> 00:01:58,200
+Tell us how you made it fast
+62
+00:01:58,000 --> 00:01:59,400
+FAST TRACK
+63
+00:01:59,000 --> 00:02:00,000
+— perfect start
+64
+00:02:00,000 --> 00:02:01,400
+FAST TRACK
+65
+00:02:01,200 --> 00:02:02,500
+— play the part
+66
+00:02:02,500 --> 00:02:03,800
+Smile and tell the camera how
+67
+00:02:03,800 --> 00:02:05,000
+You earned what you were handed out
+68
+00:02:05,200 --> 00:02:06,800
+And me?
+69
+00:02:07,000 --> 00:02:08,500
+I know nobody.
+70
+00:02:08,600 --> 00:02:10,200
+No uncle in the lobby
+71
+00:02:10,400 --> 00:02:12,000
+No number I could call
+72
+00:02:12,200 --> 00:02:13,800
+No family name above me
+73
+00:02:14,000 --> 00:02:15,400
+No hand behind the wall
+74
+00:02:15,500 --> 00:02:16,500
+No lounge
+75
+00:02:16,600 --> 00:02:17,400
+No pass
+76
+00:02:17,400 --> 00:02:18,800
+No seat reserved
+77
+00:02:19,000 --> 00:02:20,500
+I built the tracks at home
+78
+00:02:20,600 --> 00:02:21,800
+And made the system swerve
+79
+00:02:22,000 --> 00:02:22,900
+Three songs
+80
+00:02:23,000 --> 00:02:23,900
+Three clicks
+81
+00:02:24,000 --> 00:02:25,500
+No permission asked
+82
+00:02:25,600 --> 00:02:27,200
+You inherited clearance
+83
+00:02:27,300 --> 00:02:29,000
+I engineered the fast track
+84
+00:02:29,500 --> 00:02:32,000
+Maybe I move this fast
+85
+00:02:32,200 --> 00:02:35,500
+’cause standing still feels worse
+86
+00:02:36,000 --> 00:02:37,800
+Maybe if I stop
+87
+00:02:37,900 --> 00:02:39,500
+I have to wait
+88
+00:02:39,600 --> 00:02:43,500
+for someone to choose me first
+89
+00:02:45,200 --> 00:02:46,500
+Fuck that.
+90
+00:02:53,200 --> 00:02:54,400
+FAST TRACK
+91
+00:02:54,200 --> 00:02:55,200
+— built my lane
+92
+00:02:55,200 --> 00:02:56,200
+FAST TRACK
+93
+00:02:56,000 --> 00:02:57,000
+— changed the game
+94
+00:02:57,000 --> 00:02:58,200
+FAST TRACK
+95
+00:02:58,200 --> 00:02:59,400
+— keep your pass
+96
+00:02:59,400 --> 00:03:00,500
+I don’t need your gate for that
+97
+00:03:00,600 --> 00:03:01,600
+FAST TRACK
+98
+00:03:01,400 --> 00:03:02,500
+— no family name
+99
+00:03:02,500 --> 00:03:03,400
+FAST TRACK
+100
+00:03:03,200 --> 00:03:04,500
+— no borrowed fame
+101
+00:03:04,500 --> 00:03:06,800
+You were waved inside the door
+102
+00:03:06,900 --> 00:03:09,800
+I stopped needing doors
+103
+00:03:09,800 --> 00:03:12,500
+FAST TRACK
+104
+00:03:13,000 --> 00:03:16,800
+FAST TRACK
+105
+00:03:17,000 --> 00:03:18,500
+Keep your lounge
+106
+00:03:18,600 --> 00:03:19,800
+Keep your gate
+107
+00:03:19,900 --> 00:03:21,500
+Keep your little VIP parade
+108
+00:03:23,000 --> 00:03:25,000
+Who’s fast now?
+109
+00:03:26,800 --> 00:03:28,500
+Wrong question.
+110
+00:03:29,800 --> 00:03:32,000
+I didn’t win your race.
+111
+00:03:33,000 --> 00:03:35,500
+I didn’t skip your line.
+112
+00:03:36,300 --> 00:03:39,000
+I deleted the queue.
