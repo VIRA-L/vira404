@@ -3,7 +3,7 @@
  * ========================================================== */
 
 /* ==========================================================
- * ÉTAT GLOBAL + CACHE DOM
+ * 1 - ÉTAT GLOBAL + CACHE DOM
  * ========================================================== */
 
 const appState = {
@@ -83,7 +83,7 @@ function setCachedElement(id, element) {
 }
 
 /* ==========================================================
- * UTILITAIRES GÉNÉRAUX / MÉDIAS
+ * 2 - UTILITAIRES GÉNÉRAUX / MÉDIAS
  * ========================================================== */
 
 function setText(element, value = '') {
@@ -214,7 +214,7 @@ async function askUserForFile(message) {
 }
 
 /* ==========================================================
- * INITIALISATION GLOBALE
+ * 3 - INITIALISATION GLOBALE
  * ========================================================== */
 
 async function initApp() {
@@ -249,7 +249,7 @@ async function initApp() {
 }
 
 /* ==========================================================
- * MODULE CONFIGURATION & TRADUCTION
+ * 4 - MODULE CONFIGURATION & TRADUCTION
  * ========================================================== */
 
 function processConfig(text) {
@@ -514,7 +514,7 @@ function parseConfigTxt(text) {
 }
 
 /* ==========================================================
- * MODULE PAVÉ 3 — FEATURED AUDIO
+ * 5 - MODULE PAVÉ 3 — FEATURED AUDIO
  * ========================================================== */
 
 async function startFeaturedAudio() {
@@ -562,7 +562,7 @@ function stopFeaturedAudio() {
 }
 
 /* ==========================================================
- * MODULE PAVÉ 2 — RADIO / CATALOGUE / LECTURE / CONTRÔLES
+ * 6 - MODULE PAVÉ 2 — RADIO / CATALOGUE / LECTURE / CONTRÔLES
  * ========================================================== */
 
 function processCatalogue(text) {
@@ -858,17 +858,111 @@ function triggerRadioDownload(e) {
 }
 
 /* ==========================================================
- * MODULE PAROLES & SYNCHRONISATION (SRT/TXT)
+ * 7 - MODULE PAROLES & SYNCHRONISATION (SRT/TXT)
+ * ========================================================== */
+/* ==========================================================
+ * PARSEUR SRT AVEC REMPLISSAGE AUTOMATIQUE DES BLANCS (🎵🎶)
  * ========================================================== */
 
+function parseSrtTime(timeStr) {
+    if (!timeStr) return 0;
+    const normalized = timeStr.trim().replace(',', '.');
+    const parts = normalized.split(':');
+    if (parts.length < 3) return 0;
+
+    const hours = parseFloat(parts[0]) || 0;
+    const minutes = parseFloat(parts[1]) || 0;
+    const seconds = parseFloat(parts[2]) || 0;
+
+    return (hours * 3600) + (minutes * 60) + seconds;
+}
+
+function parseSRT(data) {
+    if (!data) return [];
+    const lines = data.replace(/\r/g, '').split('\n');
+    const rawSubtitles = [];
+    let currentSub = null;
+    let textLines = [];
+
+    // 1. Analyse classique ligne par ligne du SRT
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        if (line.includes('-->')) {
+            if (currentSub) {
+                currentSub.text = textLines.join('<br>');
+                rawSubtitles.push(currentSub);
+            }
+            const parts = line.split('-->');
+            currentSub = {
+                startSec: parseSrtTime(parts[0]),
+                endSec: parseSrtTime(parts[1])
+            };
+            textLines = [];
+        } else if (currentSub && line !== '') {
+            const nextLine = (i + 1 < lines.length) ? lines[i + 1].trim() : '';
+            if (nextLine.includes('-->') && /^\d+$/.test(line)) {
+                continue;
+            }
+            textLines.push(line);
+        }
+    }
+    
+    if (currentSub) {
+        currentSub.text = textLines.join('<br>');
+        rawSubtitles.push(currentSub);
+    }
+
+    if (rawSubtitles.length === 0) return [];
+
+    // 2. Insertion automatique des blocs "🎵🎶 🎵🎶 🎵🎶" dans les silences
+    const subtitles = [];
+    const GAP_THRESHOLD = 3.0; // Seuil en secondes : si un blanc dépasse 3s, on met des notes
+
+    // Si l'intro de la chanson dépasse le seuil avant la première parole
+    if (rawSubtitles[0].startSec > GAP_THRESHOLD) {
+        subtitles.push({
+            startSec: 0,
+            endSec: rawSubtitles[0].startSec,
+            text: "🎵🎶 🎵🎶 🎵🎶"
+        });
+    }
+
+    // Parcours des blocs pour combler les trous entre les phrases
+    for (let i = 0; i < rawSubtitles.length; i++) {
+        subtitles.push(rawSubtitles[i]);
+
+        if (i + 1 < rawSubtitles.length) {
+            const currentEnd = rawSubtitles[i].endSec;
+            const nextStart = rawSubtitles[i + 1].startSec;
+            const gap = nextStart - currentEnd;
+
+            if (gap >= GAP_THRESHOLD) {
+                subtitles.push({
+                    startSec: currentEnd,
+                    endSec: nextStart,
+                    text: "🎵🎶 🎵🎶 🎵🎶"
+                });
+            }
+        }
+    }
+
+    return subtitles;
+}
+
+/**  * Chargeur avec distinction explicite entre SRT (horodaté) et TXT (brut) */
 async function loadRadioLyrics(trackName) {
     const srtText = await fetchTextResource(`lyrics/${trackName}.srt`);
 
     if (srtText !== null) {
-        appState.radioSrtData = parseSRT(srtText);
-        return;
+        const parsed = parseSRT(srtText);
+        if (parsed.length > 0) {
+            appState.radioSrtData = parsed;
+            return;
+        }
     }
 
+    // Fichier TXT de la piste : on NE PASSE PAS dans parseSRT() !
     const txtText = await fetchTextResource(`lyrics/${trackName}.txt`);
 
     if (txtText !== null) {
@@ -882,6 +976,7 @@ async function loadRadioLyrics(trackName) {
         return;
     }
 
+    // Fichier TXT de secours global
     const fallbackText = await fetchTextResource('lyrics/00a-lyrics-nocode.txt');
 
     if (fallbackText !== null) {
@@ -906,66 +1001,72 @@ async function loadRadioLyrics(trackName) {
     }
 }
 
-function parseSRT(data) {
-    const subtitles = [];
-    const blocks = data.replace(/\r/g, '').split('\n\n');
-
-    for (const block of blocks) {
-        const lines = block.split('\n');
-        if (lines.length < 3) continue;
-
-        const timeLine = lines[1];
-        const textLines = lines.slice(2).join('<br>');
-        const times = timeLine.split(' --> ');
-
-        if (times.length !== 2) continue;
-
-        const startSec = parseSrtTime(times[0]);
-        const endSec = parseSrtTime(times[1]);
-
-        subtitles.push({ startSec, endSec, text: textLines });
-    }
-
-    return subtitles;
-}
-
-function parseSrtTime(timeStr) {
-    const parts = timeStr.split(':');
-    if (parts.length < 3) return 0;
-
-    const hours = parseInt(parts[0], 10);
-    const minutes = parseInt(parts[1], 10);
-    const secParts = parts[2].split(',');
-    const seconds = parseInt(secParts[0], 10);
-    const milliseconds = parseInt(secParts[1] || 0, 10);
-
-    return (hours * 3600) + (minutes * 60) + seconds + (milliseconds / 1000);
-}
-
+/**  * Synchronisation dynamique avec extraction des 5 lignes  */
 function syncRadioLyrics(currentTime) {
     const container = dom['radio-lyrics-container'];
-    if (!container) return;
+    if (!container || !appState.radioSrtData || !appState.radioSrtData.length) return;
 
-    if (!appState.radioSrtData.length) {
-        container.innerHTML = '<span class="no-lyrics">...</span>';
+    // Cas 1 : Texte brut complet (TXT)
+    if (appState.radioSrtData.length === 1 && appState.radioSrtData[0].startSec === 0 && appState.radioSrtData[0].endSec === 999999) {
+        
+        // CORRECTION PB 2 : On rend le 'lastState' unique pour chaque piste
+        const stateId = 'txt-plain-' + appState.currentRadioTrackIndex; 
+        
+        if (container.dataset.lastState !== stateId) {
+            container.dataset.lastState = stateId;
+            container.innerHTML = `<div class="srt-line srt-plain">${appState.radioSrtData[0].text}</div>`;
+            
+            // CORRECTION PB 1.1 et 1.2 : On force l'alignement en haut pour libérer le scroll
+            container.style.justifyContent = 'flex-start'; 
+            container.scrollTop = 0; // Remonte l'ascenseur au changement de piste
+        }
         return;
     }
 
-    const currentSub = appState.radioSrtData.find(
+    // Cas 2 : SRT - Recherche de l'index actif
+    let activeIndex = appState.radioSrtData.findIndex(
         (sub) => currentTime >= sub.startSec && currentTime <= sub.endSec
     );
 
-    const nextHtml = currentSub
-        ? currentSub.text
-        : '<span class="no-lyrics">...</span>';
+    let isCurrentlyActive = true;
 
-    if (container.innerHTML !== nextHtml) {
-        container.innerHTML = nextHtml;
+    if (activeIndex === -1) {
+        isCurrentlyActive = false;
+        const nextIndex = appState.radioSrtData.findIndex(sub => sub.startSec > currentTime);
+        if (nextIndex !== -1) {
+            activeIndex = nextIndex; 
+        } else {
+            activeIndex = appState.radioSrtData.length - 1;
+        }
     }
+
+    const stateId = `${activeIndex}_${isCurrentlyActive}`;
+    if (container.dataset.lastState === stateId) return;
+    container.dataset.lastState = stateId;
+
+    // RESTAURATION : On remet le centrage vertical pour le mode Karaoké/SRT
+    container.style.justifyContent = 'center';
+
+    const prev2 = activeIndex - 2 >= 0 ? appState.radioSrtData[activeIndex - 2].text : '';
+    const prev1 = activeIndex - 1 >= 0 ? appState.radioSrtData[activeIndex - 1].text : '';
+    const activeText = appState.radioSrtData[activeIndex].text;
+    const next1 = activeIndex + 1 < appState.radioSrtData.length ? appState.radioSrtData[activeIndex + 1].text : '';
+    const next2 = activeIndex + 2 < appState.radioSrtData.length ? appState.radioSrtData[activeIndex + 2].text : '';
+
+    let html = '';
+    if (prev2) html += `<div class="srt-line srt-prev srt-prev-2">${prev2}</div>`;
+    if (prev1) html += `<div class="srt-line srt-prev srt-prev-1">${prev1}</div>`;
+
+    html += `<div class="srt-line ${isCurrentlyActive ? 'srt-active' : 'srt-waiting'}">${activeText}</div>`;
+
+    if (next1) html += `<div class="srt-line srt-next srt-next-1">${next1}</div>`;
+    if (next2) html += `<div class="srt-line srt-next srt-next-2">${next2}</div>`;
+
+    container.innerHTML = html;
 }
 
 /* ==========================================================
- * MODULES ANNEXES — COMPTE À REBOURS / SCROLL / MINI-JEU
+ * 8 - MODULES ANNEXES — COMPTE À REBOURS / SCROLL / MINI-JEU
  * ========================================================== */
 
 function initCountdown(dateString) {
@@ -1151,7 +1252,7 @@ function initRetroGame() {
 }
 
 /* ==========================================================
- * ÉCOUTEUR DOMCONTENTLOADED UNIQUE
+ * 9 - ÉCOUTEUR DOMCONTENTLOADED UNIQUE
  * ========================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {

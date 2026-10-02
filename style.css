@@ -248,19 +248,54 @@ html, body {
     scrollbar-width: thin;
     scrollbar-color: var(--accent-teal) transparent;
     z-index: 1;
+    display: flex; /* RAJOUT KARAOKE */
+    flex-direction: column; /* RAJOUT KARAOKE */
+    justify-content: center; /* RAJOUT KARAOKE */
+    align-items: center; /* RAJOUT KARAOKE */
 }
 
+/* [04. PAVÉ 2] Gestion des lignes du Karaoké & Modes SRT/TXT */
 .srt-line {
-    font-size: 0.95rem;
-    color: var(--accent-fuchsia);
-    margin: 12px 0;
-    transition: color 0.3s ease, font-size 0.3s ease, transform 0.3s ease;
+    transition: all 0.3s ease;
+    margin: 6px 0;
+    width: 100%;
+    word-break: break-word;
 }
 
-.srt-line.active {
+/* Lignes précédentes / suivantes (haut et bas) */
+.srt-prev, .srt-next {
+    opacity: 0.7;
+    font-size: 1.5rem;
+    font-weight: 550;
+    color: var(--accent-fuchsia);
+}
+
+/* Ligne active au centre (surbrillance cyan + compatibilité .active) */
+.srt-active, .srt-line.active {
+    opacity: 1;
+    font-size: 2rem;
+    font-weight: 700;
     color: var(--accent-teal) !important;
-    font-weight: bold;
-    font-size: 1.05rem;
+    text-shadow: 0 0 20px var(--accent-teal);
+}
+
+/* Ligne en attente / silences / notes */
+.srt-waiting {
+    opacity: 0.6;
+    font-size: 2rem;
+    color: var(--accent-teal);
+}
+
+/* Mode TXT brut (affichage en pavé avec ascenseur) */
+.srt-plain {
+    opacity: 0.85;
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1.6;
+    padding: 10px;
+    margin: 0 auto; /* 'auto 0' Modifié par '0 auto' pour libérer les marges verticales */
+/*    white-space: pre;              *//* Empêche d'écraser les espaces et respecte les sauts de ligne */
+/*    font-family: monospace;        *//* Force une police à largeur fixe pour aligner l'ASCII art */
 }
 
 #pave-radio .pave-footer {
