@@ -3,13 +3,13 @@
 [LANDING]
 title = "VIRA404"
 artwork = "index.webp" 
-link1text = "☣️YouTube🎞️"
+link1text = "☣️YTube🎞️"
 link1page = "https://www.youtube.com/@vira_l_music"
 link2text = "💔Insta📸"
 link2page = "https://www.instagram.com/vira_l.music/"
 link3text = "⚡Suno🎸"
 link3page = "https://suno.com/voice/3da34a18-171b-48c1-9cb7-28fd0a1ca62a" 
-link4text = "👎Complain✉️"
+link4text = "Complain"
 link4page = "mailto:viral.official@outlook.com" 
 
 [LANDING_EN]

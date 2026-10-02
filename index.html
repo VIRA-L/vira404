@@ -41,7 +41,7 @@
 
         <!-- 1. Le Header en haut -->
         <div class="pave-header">
-            <h3>LIVE RADIO</h3>
+            <h3 id="radio-title-header">LIVE RADIO</h3>
             <span id="radio-badge" class="live-badge is-off">OFF AIR</span>
         </div>
 
@@ -63,7 +63,7 @@
 
             <div class="radio-controls-row">
                 <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Cover Morceau" />
-                <button id="radio-toggle-btn" class="btn-ctrl" title="Lecture / Pause">▶</button>
+                <button id="radio-toggle-btn" class="btn-ctrl" title="Lecture / Pause"><span style="margin-left: 4px;">▶</span></button>
                 <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Cover Album" />
             </div>
         </div>
@@ -76,7 +76,7 @@
         <section class="pave pave-3" id="pave-featured">
             <div class="pave-content">
                 <div class="pave-header">
-                    <h3>FEATURED</h3>
+                    <h3 id="featured-title-header">FEATURED</h3>
                     <p id="featured-date" class="featured-date"></p>
                     <p id="featured-caption"></p>
                 </div>
@@ -86,10 +86,10 @@
                 <div class="pave-footer">
                     <h4 id="featured-track-title"></h4>
                     <div class="custom-parser-controls">
-                        <button id="feat-rewind" class="btn-mini" title="Reculer 10s">⏪</button>
-                        <button id="feat-play" class="btn-mini" title="Lecture / Pause">⏯️</button>
-                        <button id="feat-forward" class="btn-mini" title="Avancer 10s">⏩</button>
-                        <button id="feat-loop" class="btn-mini" title="Lecture en boucle">🔁</button>
+                        <button id="feat-rewind" class="btn-mini" title="Reculer 10s">⏮</button>
+                        <button id="feat-play" class="btn-mini" title="Lecture / Pause">▶</button>
+                        <button id="feat-forward" class="btn-mini" title="Avancer 10s">⏭</button>
+                        <button id="feat-loop" class="btn-mini" title="Lecture en boucle">↻</button>
                         <input type="range" id="feat-seek" value="0" max="100" title="Position">
                         <input type="range" id="feat-volume" min="0" max="1" step="0.01" value="0.8" title="Volume">
                     </div>

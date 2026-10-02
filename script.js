@@ -1,284 +1,484 @@
-let parsedConfig = null;
-let currentLang = localStorage.getItem('userLang') || 'EN'; // <--- MODIFIÉ ICI
-let catalogueTracks = [];
-let totalRadioDuration = 0;
-let currentRadioTrackIndex = -1;
-let radioSrtData = [];
-let radioInterval = null;
+/* ==========================================================
+ * VIRA404 — Application script
+ * ========================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
-    async function initApp() {
-        let configText = "";
-        let catalogueText = "";
+/* ==========================================================
+ * ÉTAT GLOBAL + CACHE DOM
+ * ========================================================== */
 
-        try {
-            const resConfig = await fetch('Config404.txt');
-            if (!resConfig.ok) throw new Error();
-            configText = await resConfig.text();
-        } catch (e) {
-            configText = await askUserForFile("Sélectionne ton fichier : Config404.txt");
+const appState = {
+    parsedConfig: null,
+    currentLang: localStorage.getItem('userLang') || 'EN',
+    catalogueTracks: [],
+    totalRadioDuration: 0,
+    currentRadioTrackIndex: -1,
+    radioSrtData: [],
+    radioInterval: null,
+    countdownInterval: null,
+    featuredAudio: null,
+    radioAudio: null,
+    featuredSource: null,
+    radioSource: null,
+};
+
+const dom = {};
+
+function cacheDom() {
+    const ids = [
+        'btn-lang-en',
+        'btn-lang-ru',
+        'featured-track-title',
+        'featured-caption',
+        'featured-artwork-container',
+        'featured-date',
+        'featured-audio',
+        'feat-play',
+        'feat-rewind',
+        'feat-forward',
+        'feat-loop',
+        'feat-seek',
+        'feat-volume',
+        'featured-title-header',
+        'working-title',
+        'working-caption1',
+        'working-caption2',
+        'working-artwork-container',
+        'landing-title',
+        'landing-subtitle',
+        'landing-caption1',
+        'landing-caption2',
+        'landing-caption3',
+        'landing-links',
+        'pave-landing',
+        'radio-audio',
+        'radio-toggle-btn',
+        'radio-badge',
+        'radio-title-header',
+        'radio-cover-img',
+        'radio-download-btn',
+        'radio-track-title',
+        'radio-track-info',
+        'radio-album-name',
+        'radio-album-img',
+        'radio-lyrics-container',
+        'countdown-timer',
+        'retro-game-layer',
+        'retro-paddle',
+    ];
+
+    ids.forEach((id) => {
+        dom[id] = document.getElementById(id);
+    });
+
+    dom.gridContainer = document.querySelector('.grid-container');
+}
+
+function refreshDomCache() {
+    cacheDom();
+}
+
+function setCachedElement(id, element) {
+    dom[id] = element;
+    return element;
+}
+
+/* ==========================================================
+ * UTILITAIRES GÉNÉRAUX / MÉDIAS
+ * ========================================================== */
+
+function setText(element, value = '') {
+    if (element) element.innerText = value;
+}
+
+function setBackgroundImage(element, url) {
+    if (!element || !url) return;
+
+    element.style.backgroundImage = `url('${url}')`;
+    element.style.backgroundSize = 'cover';
+    element.style.backgroundPosition = 'center';
+}
+
+function readStoredVolume(fallback = 0.8) {
+    const stored = localStorage.getItem('audioVolume');
+    const volume = stored !== null ? parseFloat(stored) : fallback;
+    return Number.isFinite(volume) ? volume : fallback;
+}
+
+async function resourceExists(url) {
+    if (!url) return false;
+
+    try {
+        const response = await fetch(url, {
+            method: 'HEAD',
+            cache: 'no-store',
+        });
+        return response.ok;
+    } catch {
+        return false;
+    }
+}
+
+async function resolveFirstAvailable(candidates) {
+    for (const candidate of candidates) {
+        if (await resourceExists(candidate)) return candidate;
+    }
+    return null;
+}
+
+async function resolveAudioSource(trackName) {
+    if (!trackName) return null;
+
+    return resolveFirstAvailable([
+        `audio/${trackName}.m4a`,
+        `audio/${trackName}.mp3`,
+    ]);
+}
+
+async function setImageWithFallback(element, primaryUrl, fallbackUrl, requestKey = '') {
+    if (!element) return;
+
+    const key = requestKey || primaryUrl || '';
+    element.dataset.mediaRequest = key;
+
+    if (await resourceExists(primaryUrl)) {
+        if (element.dataset.mediaRequest === key) {
+            element.src = primaryUrl;
         }
-
-        if (configText) processConfig(configText);
-
-        try {
-            const resCat = await fetch('Catalogue Vira L.txt');
-            if (!resCat.ok) throw new Error();
-            catalogueText = await resCat.text();
-        } catch (e) {
-            catalogueText = await askUserForFile("Sélectionne ton fichier : Catalogue Vira L.txt");
-        }
-
-        if (catalogueText) processCatalogue(catalogueText);
+        return;
     }
 
-    // Appel indispensable de l'initialisation pour que tout se lance
-    initApp();
-});
+    if (fallbackUrl && await resourceExists(fallbackUrl)) {
+        if (element.dataset.mediaRequest === key) {
+            element.src = fallbackUrl;
+        }
+    }
+}
 
-// Petite boîte de secours pour choisir le fichier si le navigateur bloque
-function askUserForFile(message) {
+async function fetchTextResource(path) {
+    if (!path) return null;
+
+    try {
+        const response = await fetch(path, { cache: 'no-store' });
+        if (!response.ok) return null;
+        return await response.text();
+    } catch {
+        return null;
+    }
+}
+
+function createAudioElement(id, preload = 'none') {
+    let audio = dom[id];
+
+    if (!audio) {
+        audio = document.createElement('audio');
+        audio.id = id;
+        audio.preload = preload;
+        document.body.appendChild(audio);
+    }
+
+    setCachedElement(id, audio);
+    return audio;
+}
+
+async function askUserForFile(message) {
     return new Promise((resolve) => {
         const div = document.createElement('div');
-        div.style.cssText = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#222; color:#fff; padding:20px; border:2px solid #ff3333; z-index:9999; text-align:center; font-family:sans-serif;";
+        div.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#222; color:#fff; padding:20px; border:2px solid #ff3333; z-index:9999; text-align:center; font-family:sans-serif;';
         div.innerHTML = `<p style="margin-bottom:10px;">${message}</p><input type="file" id="file-picker">`;
         document.body.appendChild(div);
 
-        document.getElementById('file-picker').addEventListener('change', (event) => {
+        const input = div.querySelector('#file-picker');
+        if (!input) {
+            div.remove();
+            resolve('');
+            return;
+        }
+
+        input.addEventListener('change', (event) => {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    div.remove();
-                    resolve(e.target.result);
-                };
-                reader.readAsText(file);
-            }
+
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                div.remove();
+                resolve(e.target.result || '');
+            };
+            reader.onerror = () => {
+                div.remove();
+                resolve('');
+            };
+            reader.readAsText(file);
         });
     });
 }
 
-// --- CONFIG & PAVÉ 3 (RESTAURÉ À L'IDENTIQUE) ---
+/* ==========================================================
+ * INITIALISATION GLOBALE
+ * ========================================================== */
+
+async function initApp() {
+    refreshDomCache();
+
+    let configText = '';
+    let catalogueText = '';
+
+    try {
+        const resConfig = await fetch('Config404.txt');
+        if (!resConfig.ok) throw new Error('Config404.txt introuvable');
+        configText = await resConfig.text();
+    } catch {
+        configText = await askUserForFile('Sélectionne ton fichier : Config404.txt');
+    }
+
+    if (configText) processConfig(configText);
+
+    try {
+        const resCatalogue = await fetch('Catalogue Vira L.txt');
+        if (!resCatalogue.ok) throw new Error('Catalogue Vira L.txt introuvable');
+        catalogueText = await resCatalogue.text();
+    } catch {
+        catalogueText = await askUserForFile('Sélectionne ton fichier : Catalogue Vira L.txt');
+    }
+
+    if (catalogueText) processCatalogue(catalogueText);
+
+    initHorizontalScroll();
+    initActivePlayerRestore();
+    initRetroGame();
+}
+
+/* ==========================================================
+ * MODULE CONFIGURATION & TRADUCTION
+ * ========================================================== */
+
 function processConfig(text) {
-    parsedConfig = parseConfigTxt(text);
+    appState.parsedConfig = parseConfigTxt(text);
 
-    const btnEn = document.getElementById('btn-lang-en');
-    const btnRu = document.getElementById('btn-lang-ru');
-    if (btnEn) btnEn.onclick = () => switchLanguage('EN');
-    if (btnRu) btnRu.onclick = () => switchLanguage('RU');
-    if (btnEn) btnEn.classList.toggle('active', currentLang === 'EN');
-    if (btnRu) btnRu.classList.toggle('active', currentLang === 'RU');
-
-    // 1. PAVÉ 1 : Rendu Landing
+    bindLanguageButtons();
     renderLanding();
+    initFeaturedFromConfig();
+    renderWorkingFromConfig();
+}
 
-    const featTitle = document.getElementById('featured-track-title');
-    if (featTitle) featTitle.innerText = parsedConfig.FEATURED?.track || "";
-
-    const featCaption = document.getElementById('featured-caption');
-    if (featCaption) featCaption.innerText = parsedConfig.FEATURED?.caption || "";
-
-    const featuredArtwork = parsedConfig.FEATURED?.artwork;
-    if (featuredArtwork) {
-        const featBox = document.getElementById('featured-artwork-container');
-        if (featBox) {
-            featBox.style.backgroundImage = `url('${featuredArtwork}')`;
-            featBox.style.backgroundSize = 'cover';
-            featBox.style.backgroundPosition = 'center';
-        }
+function bindLanguageButtons() {
+    if (dom['btn-lang-en']) {
+        dom['btn-lang-en'].onclick = () => switchLanguage('EN');
     }
 
-    // Injection de la date Pavé 3
-    const featDateElem = document.getElementById('featured-date');
-    if (featDateElem) {
-        featDateElem.innerText = parsedConfig.FEATURED?.date ? `[ ${parsedConfig.FEATURED.date} ]` : "";
+    if (dom['btn-lang-ru']) {
+        dom['btn-lang-ru'].onclick = () => switchLanguage('RU');
     }
 
-    // Initialisation du lecteur Pavé 3
-    const featuredTrack = parsedConfig.FEATURED?.track;
-    if (featuredTrack) {
-        let audio = document.getElementById('featured-audio');
-        if (!audio) {
-            audio = document.createElement('audio');
-            audio.id = 'featured-audio';
-            audio.preload = 'metadata';
-            document.body.appendChild(audio);
-        }
-        audio.src = `audio/${featuredTrack}.m4a`;
-        audio.play().catch(() => {
-            // Le navigateur bloque l'autoplay non sollicité, c'est normal.
-            // Le player sera prêt et se lancera au premier clic de l'utilisateur.
-            console.log("Autoplay en attente d'interaction utilisateur.");
-        });
+    updateLanguageButtons();
+}
 
-        const playBtn = document.getElementById('feat-play');
-        const rewindBtn = document.getElementById('feat-rewind');
-        const forwardBtn = document.getElementById('feat-forward');
-        const loopBtn = document.getElementById('feat-loop');
-        const progressBar = document.getElementById('feat-seek');
-        const volumeBar = document.getElementById('feat-volume');
-
-        if (playBtn) {
-            playBtn.onclick = () => {
-                if (audio.paused) {
-                    document.querySelectorAll('audio').forEach(a => { if (a !== audio) a.pause(); });
-                    audio.play();
-                    // Ancienne version : (rien)
-                    localStorage.setItem('activePlayer', 'featured'); // ajout sauvegarde statut featured
-                } else {
-                    audio.pause();
-                    // Ancienne version : (rien)
-                    localStorage.removeItem('activePlayer'); // ajout suppression statut featured
-                }
-            };
-        }
-
-        if (rewindBtn) rewindBtn.onclick = () => audio.currentTime = Math.max(0, audio.currentTime - 10);
-        if (forwardBtn) forwardBtn.onclick = () => audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
-
-        if (loopBtn) {
-            const savedLoop = localStorage.getItem('audioLoop') === 'true';
-            audio.loop = savedLoop;
-            loopBtn.classList.toggle('active', audio.loop);
-
-            loopBtn.onclick = () => {
-                audio.loop = !audio.loop;
-                loopBtn.classList.toggle('active', audio.loop);
-                localStorage.setItem('audioLoop', audio.loop);
-            };
-        }
-
-        if (progressBar) {
-            audio.ontimeupdate = () => {
-                if (audio.duration) progressBar.value = (audio.currentTime / audio.duration) * 100;
-            };
-            progressBar.oninput = () => {
-                if (audio.duration) audio.currentTime = (progressBar.value / 100) * audio.duration;
-            };
-        }
-
-        if (volumeBar) {
-            const savedVolume = localStorage.getItem('audioVolume');
-            audio.volume = savedVolume ? parseFloat(savedVolume) : (parseFloat(volumeBar.value) || 0.8);
-            volumeBar.value = audio.volume;
-            volumeBar.oninput = () => {
-                // Ancienne version : audio.volume = parseFloat(volumeBar.value); localStorage.setItem('audioVolume', audio.volume);
-                audio.volume = parseFloat(volumeBar.value); // nouvelle version
-                const radioAudio = document.getElementById('radio-audio'); // nouvelle version
-                if (radioAudio) radioAudio.volume = audio.volume; // nouvelle version
-                localStorage.setItem('audioVolume', audio.volume); // nouvelle version
-            };
-        }
+function updateLanguageButtons() {
+    if (dom['btn-lang-en']) {
+        dom['btn-lang-en'].classList.toggle('active', appState.currentLang === 'EN');
     }
 
-    // 3. PAVÉ 4 : Working (Rendu garanti)
-    const workTitle = document.getElementById('working-title');
-    if (workTitle) workTitle.innerText = parsedConfig.WORKING?.title || "";
-
-    const workCap1 = document.getElementById('working-caption1');
-    if (workCap1) workCap1.innerText = parsedConfig.WORKING?.caption1 || "";
-
-    const workCap2 = document.getElementById('working-caption2');
-    if (workCap2) workCap2.innerText = parsedConfig.WORKING?.caption2 || "";
-
-    const workingArtwork = parsedConfig.WORKING?.artwork;
-    if (workingArtwork) {
-        const workBox = document.getElementById('working-artwork-container');
-        if (workBox) {
-            workBox.style.backgroundImage = `url('${workingArtwork}')`;
-            workBox.style.backgroundSize = 'cover';
-            workBox.style.backgroundPosition = 'center';
-        }
-    }
-
-    if (parsedConfig.WORKING?.date) {
-        initCountdown(parsedConfig.WORKING.date);
+    if (dom['btn-lang-ru']) {
+        dom['btn-lang-ru'].classList.toggle('active', appState.currentLang === 'RU');
     }
 }
 
 function switchLanguage(lang) {
-    if (currentLang === lang) return;
-    currentLang = lang;
+    if (appState.currentLang === lang) return;
+
+    appState.currentLang = lang;
     localStorage.setItem('userLang', lang);
 
-    const btnEn = document.getElementById('btn-lang-en');
-    const btnRu = document.getElementById('btn-lang-ru');
-    if (btnEn) btnEn.classList.toggle('active', lang === 'EN');
-    if (btnRu) btnRu.classList.toggle('active', lang === 'RU');
-
+    updateLanguageButtons();
     renderLanding();
-    if (typeof updateRadioPassiveUI === 'function') updateRadioPassiveUI();
+    updateRadioPassiveUI();
 }
 
 function renderLanding() {
+    const parsedConfig = appState.parsedConfig;
     if (!parsedConfig) return;
 
     const baseData = parsedConfig.LANDING || {};
-    const langData = parsedConfig[`LANDING_${currentLang}`] || {};
+    const langData = parsedConfig[`LANDING_${appState.currentLang}`] || {};
     const configLanding = { ...baseData, ...langData };
 
-    document.getElementById('landing-title').innerText = configLanding.title || "VIRA404";
-    let subtitleText = configLanding.subtitle || "";
+    setText(dom['landing-title'], configLanding.title || 'VIRA404');
+
+    let subtitleText = configLanding.subtitle || '';
     subtitleText = subtitleText.replace(
-        "NoCodeGirl", 
-        `<span style="color: var(--accent-fuchsia);">No</span><span style="color: var(--accent-teal);">Code</span><span style="color: var(--accent-fuchsia);">Girl</span>`
+        'NoCodeGirl',
+        '<span style="color: var(--accent-fuchsia);">No</span><span style="color: var(--accent-teal);">Code</span><span style="color: var(--accent-fuchsia);">Girl</span>'
     );
 
-    document.getElementById('landing-subtitle').innerHTML = subtitleText;
-    document.getElementById('landing-caption1').innerText = configLanding.caption1 || "";
-    document.getElementById('landing-caption2').innerText = configLanding.caption2 || "";
-    document.getElementById('landing-caption3').innerText = configLanding.caption3 || "";
+    if (dom['landing-subtitle']) dom['landing-subtitle'].innerHTML = subtitleText;
 
-    const linksBox = document.getElementById('landing-links');
-    if (linksBox) {
-        linksBox.innerHTML = '';
-        linksBox.className = 'pave-footer social-grid';
+    setText(dom['landing-caption1'], configLanding.caption1 || '');
+    setText(dom['landing-caption2'], configLanding.caption2 || '');
+    setText(dom['landing-caption3'], configLanding.caption3 || '');
 
-        for (let i = 1; i <= 4; i++) {
-            const textLink = configLanding[`link${i}text`];
-            const pageLink = configLanding[`link${i}page`];
-            
-            if (textLink && pageLink) {
-                const a = document.createElement('a');
-                a.href = pageLink;
-                a.className = 'social-btn';
-                a.target = "_blank";
+    renderLandingLinks(configLanding);
+    setBackgroundImage(dom['pave-landing'], configLanding.artwork);
+}
 
-                const firstChar = Array.from(textLink)[0] || '🔗';
-                const iconContainer = document.createElement('span');
-                iconContainer.className = 'social-icon';
+function renderLandingLinks(configLanding) {
+    const linksBox = dom['landing-links'];
+    if (!linksBox) return;
 
-                const img = document.createElement('img');
-                img.src = `assets/link${i}.svg`;
-                img.alt = textLink;
+    linksBox.innerHTML = '';
+    linksBox.className = 'pave-footer social-grid';
 
-                img.onerror = function() {
-                    this.onerror = null;
-                    iconContainer.innerText = firstChar;
-                };
+    for (let i = 1; i <= 4; i++) {
+        const textLink = configLanding[`link${i}text`];
+        const pageLink = configLanding[`link${i}page`];
 
-                iconContainer.appendChild(img);
+        if (!textLink || !pageLink) continue;
 
-                const labelSpan = document.createElement('span');
-                labelSpan.className = 'social-label';
-                labelSpan.innerText = textLink;
+        const link = document.createElement('a');
+        link.href = pageLink;
+        link.className = 'social-btn';
+        link.target = '_blank';
 
-                a.appendChild(iconContainer);
-                a.appendChild(labelSpan);
-                linksBox.appendChild(a);
+        const firstChar = Array.from(textLink)[0] || '🔗';
+
+        const iconContainer = document.createElement('span');
+        iconContainer.className = 'social-icon';
+
+        const img = document.createElement('img');
+        img.alt = textLink;
+
+        // Validation avant affectation : aucun chargement 404 volontaire.
+        applyLinkIcon(img, iconContainer, `assets/link${i}.webp`, firstChar);
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'social-label';
+        labelSpan.innerText = textLink;
+
+        iconContainer.appendChild(img);
+        link.appendChild(iconContainer);
+        link.appendChild(labelSpan);
+        linksBox.appendChild(link);
+    }
+}
+
+async function applyLinkIcon(img, container, imageUrl, fallbackChar) {
+    if (await resourceExists(imageUrl)) {
+        img.src = imageUrl;
+        return;
+    }
+
+    img.remove();
+    container.innerText = fallbackChar;
+}
+
+function initFeaturedFromConfig() {
+    const featured = appState.parsedConfig?.FEATURED || {};
+
+    setText(dom['featured-track-title'], featured.track || '');
+    setText(dom['featured-caption'], featured.caption || '');
+    setText(dom['featured-date'], featured.date ? `[ ${featured.date} ]` : '');
+    setBackgroundImage(dom['featured-artwork-container'], featured.artwork);
+
+    const featuredTrack = featured.track;
+    if (!featuredTrack) return;
+
+    const audio = createAudioElement('featured-audio', 'metadata');
+    appState.featuredAudio = audio;
+    appState.featuredSource = null;
+    audio.volume = readStoredVolume(parseFloat(dom['feat-volume']?.value) || 0.8);
+
+    initializeFeaturedSource(featuredTrack, true);
+    bindFeaturedControls(audio);
+}
+
+async function initializeFeaturedSource(trackName, tryAutoplay = false) {
+    const source = await resolveAudioSource(trackName);
+    const audio = appState.featuredAudio || dom['featured-audio'];
+
+    if (!audio || !source) return false;
+
+    appState.featuredSource = source;
+    audio.src = source;
+
+    if (tryAutoplay) {
+        audio.play().catch(() => {
+            // Le navigateur peut bloquer l'autoplay : le lecteur reste disponible au clic.
+        });
+    }
+
+    return true;
+}
+
+function bindFeaturedControls(audio) {
+    if (!audio) return;
+
+    if (dom['feat-play']) {
+        dom['feat-play'].onclick = () => {
+            if (audio.paused) {
+                startFeaturedAudio();
+            } else {
+                stopFeaturedAudio();
             }
-        }
+        };
     }
 
-    const landingArtwork = configLanding.artwork;
-    if (landingArtwork) {
-        const paveLanding = document.getElementById('pave-landing');
-        if (paveLanding) {
-            paveLanding.style.backgroundImage = `url('${landingArtwork}')`;
-            paveLanding.style.backgroundSize = 'cover';
-            paveLanding.style.backgroundPosition = 'center';
-        }
+    if (dom['feat-rewind']) {
+        dom['feat-rewind'].onclick = () => {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+        };
     }
+
+    if (dom['feat-forward']) {
+        dom['feat-forward'].onclick = () => {
+            audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10);
+        };
+    }
+
+    if (dom['feat-loop']) {
+        const savedLoop = localStorage.getItem('audioLoop') === 'true';
+        audio.loop = savedLoop;
+        dom['feat-loop'].classList.toggle('active', audio.loop);
+
+        dom['feat-loop'].onclick = () => {
+            audio.loop = !audio.loop;
+            dom['feat-loop'].classList.toggle('active', audio.loop);
+            localStorage.setItem('audioLoop', audio.loop);
+        };
+    }
+
+    if (dom['feat-seek']) {
+        audio.ontimeupdate = () => {
+            if (audio.duration) {
+                dom['feat-seek'].value = (audio.currentTime / audio.duration) * 100;
+            }
+        };
+
+        dom['feat-seek'].oninput = () => {
+            if (audio.duration) {
+                audio.currentTime = (dom['feat-seek'].value / 100) * audio.duration;
+            }
+        };
+    }
+
+    if (dom['feat-volume']) {
+        dom['feat-volume'].value = audio.volume;
+        dom['feat-volume'].oninput = () => {
+            const volume = parseFloat(dom['feat-volume'].value);
+            audio.volume = Number.isFinite(volume) ? volume : 0.8;
+            if (appState.radioAudio) appState.radioAudio.volume = audio.volume;
+            localStorage.setItem('audioVolume', audio.volume);
+        };
+    }
+}
+
+function renderWorkingFromConfig() {
+    const working = appState.parsedConfig?.WORKING || {};
+
+    setText(dom['working-title'], working.title || '');
+    setText(dom['working-caption1'], working.caption1 || '');
+    setText(dom['working-caption2'], working.caption2 || '');
+    setBackgroundImage(dom['working-artwork-container'], working.artwork);
+
+    if (working.date) initCountdown(working.date);
 }
 
 function parseConfigTxt(text) {
@@ -293,70 +493,132 @@ function parseConfigTxt(text) {
         if (line.startsWith('[') && line.endsWith(']')) {
             currentSection = line.substring(1, line.length - 1);
             data[currentSection] = {};
-        } else if (currentSection && line.includes('=')) {
+            continue;
+        }
+
+        if (currentSection && line.includes('=')) {
             const parts = line.split('=');
             const key = parts[0].trim();
             let value = parts.slice(1).join('=').trim();
-            value = value.replace(/\s*::.*$/, '').replace(/^["'](.*)["']$/, '$1');
-            value = value.replace(/\\n/g, '\n');
+
+            value = value
+                .replace(/\s*::.*$/, '')
+                .replace(/^["'](.*)["']$/, '$1')
+                .replace(/\\n/g, '\n');
+
             data[currentSection][key] = value;
         }
     }
+
     return data;
 }
 
-// --- PAVÉ 2 (RADIO - CORRIGÉ) ---
-function processCatalogue(text) {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
-    
-    let tempTracks = [];
-    
-    for (let line of lines) {
-        const parsed = parseCatalogueLine(line);
-        if (parsed) {
-            tempTracks.push(parsed);
-        }
+/* ==========================================================
+ * MODULE PAVÉ 3 — FEATURED AUDIO
+ * ========================================================== */
+
+async function startFeaturedAudio() {
+    const audio = appState.featuredAudio || dom['featured-audio'];
+    const playBtn = dom['feat-play'];
+    const featTitle = dom['featured-title-header'];
+
+    if (featTitle) featTitle.classList.add('pulsing-text');
+    if (!audio) return;
+
+    // Coupe proprement la radio avant de lancer le Featured.
+    stopRadioAudio();
+
+    if (!audio.src && appState.parsedConfig?.FEATURED?.track) {
+        await initializeFeaturedSource(appState.parsedConfig.FEATURED.track, false);
     }
 
-    // Calcul dynamique des endSec (le endSec d'une piste est le startSec de la suivante)
-    catalogueTracks = tempTracks.map((track, index) => {
-        let endSec;
-        if (index < tempTracks.length - 1) {
-            endSec = tempTracks[index + 1].startSec;
-        } else {
-            endSec = track.startSec + track.durationSec;
+    audio.play().then(() => {
+        if (playBtn) {
+            playBtn.classList.add('active');
+            playBtn.innerHTML = '❚❚';
         }
+        localStorage.setItem('activePlayer', 'featured');
+    }).catch(() => {
+        // Lecture refusée ou ressource indisponible : pas d'erreur console artificielle.
+    });
+}
+
+function stopFeaturedAudio() {
+    const audio = appState.featuredAudio || dom['featured-audio'];
+    const playBtn = dom['feat-play'];
+    const featTitle = dom['featured-title-header'];
+
+    if (featTitle) featTitle.classList.remove('pulsing-text');
+    if (audio) audio.pause();
+
+    if (playBtn) {
+        playBtn.classList.remove('active');
+        playBtn.innerHTML = '▶';
+    }
+
+    if (localStorage.getItem('activePlayer') === 'featured') {
+        localStorage.removeItem('activePlayer');
+    }
+}
+
+/* ==========================================================
+ * MODULE PAVÉ 2 — RADIO / CATALOGUE / LECTURE / CONTRÔLES
+ * ========================================================== */
+
+function processCatalogue(text) {
+    const lines = text
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line && !line.startsWith('#'));
+
+    const tempTracks = [];
+
+    for (const line of lines) {
+        const parsed = parseCatalogueLine(line);
+        if (parsed) tempTracks.push(parsed);
+    }
+
+    appState.catalogueTracks = tempTracks.map((track, index) => {
+        const endSec = index < tempTracks.length - 1
+            ? tempTracks[index + 1].startSec
+            : track.startSec + track.durationSec;
+
         return { ...track, endSec };
     });
 
-    if (catalogueTracks.length === 0) return;
+    appState.currentRadioTrackIndex = -1;
 
-    totalRadioDuration = catalogueTracks[catalogueTracks.length - 1].endSec;
+    if (appState.catalogueTracks.length === 0) return;
+
+    appState.totalRadioDuration = appState.catalogueTracks[appState.catalogueTracks.length - 1].endSec;
 
     initRadioControls();
     updateRadioPassiveUI();
 
-    if (radioInterval) clearInterval(radioInterval);
-    radioInterval = setInterval(updateRadioPassiveUI, 1000);
+    if (appState.radioInterval) clearInterval(appState.radioInterval);
+    appState.radioInterval = setInterval(updateRadioPassiveUI, 1000);
 }
 
 function parseTimeToSec(str) {
     if (!str) return 0;
+
     const parts = str.split(':').map(Number);
+
     if (parts.length === 3) return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
     if (parts.length === 2) return (parts[0] * 60) + parts[1];
+
     return 0;
 }
 
 function parseCatalogueLine(line) {
-    // Découpage selon ton format réel : "00:00:00 / Titre / Album / Année / Durée"
-    const parts = line.split(' / ').map(p => p.trim());
+    // Format conservé : "00:00:00 / Titre / Album / Année / Durée"
+    const parts = line.split(' / ').map((part) => part.trim());
     if (parts.length < 2) return null;
 
     const startStr = parts[0];
     const rightSide = parts[1];
-    const subParts = rightSide.split('/').map(p => p.trim());
-    
+    const subParts = rightSide.split('/').map((part) => part.trim());
+
     if (subParts.length < 4) return null;
 
     const fullName = subParts[0];
@@ -383,16 +645,22 @@ function parseCatalogueLine(line) {
         trackNum,
         album: isSingle ? null : album,
         year,
-        isSingle
+        isSingle,
     };
 }
 
 function getLiveRadioState() {
+    const { catalogueTracks, totalRadioDuration } = appState;
+
     if (!catalogueTracks.length || !totalRadioDuration) return null;
+
     const nowSec = Math.floor(Date.now() / 1000);
     const loopSec = nowSec % totalRadioDuration;
 
-    let index = catalogueTracks.findIndex(t => loopSec >= t.startSec && loopSec < t.endSec);
+    let index = catalogueTracks.findIndex(
+        (track) => loopSec >= track.startSec && loopSec < track.endSec
+    );
+
     if (index === -1) index = 0;
 
     const track = catalogueTracks[index];
@@ -408,82 +676,87 @@ function updateRadioPassiveUI() {
 
     const { trackIndex, track, offset } = state;
 
-    if (trackIndex !== currentRadioTrackIndex) {
-        currentRadioTrackIndex = trackIndex;
+    if (trackIndex !== appState.currentRadioTrackIndex) {
+        appState.currentRadioTrackIndex = trackIndex;
 
-        const titleElem = document.getElementById('radio-track-title');
-        if (titleElem) titleElem.innerText = track.cleanTitle;
+        setText(dom['radio-track-title'], track.cleanTitle);
 
-        const infoElem = document.getElementById('radio-track-info');
-        if (infoElem) {
-            const trackPrefix = currentLang === 'RU' ? 'трек' : 'Track';
-            if (track.trackNum && !track.isSingle) {
-                infoElem.innerText = `${trackPrefix} ${track.trackNum}, ${track.year}`;
-            } else {
-                infoElem.innerText = track.year;
-            }
+        if (dom['radio-track-info']) {
+            const trackPrefix = appState.currentLang === 'RU' ? 'трек' : 'Track';
+            dom['radio-track-info'].innerText = track.trackNum && !track.isSingle
+                ? `${trackPrefix} ${track.trackNum}, ${track.year}`
+                : track.year;
         }
 
-        const albumElem = document.getElementById('radio-album-name');
-        if (albumElem) {
-            albumElem.innerText = track.isSingle ? 'Single' : track.album;
-        }
+        setText(dom['radio-album-name'], track.isSingle ? 'Single' : track.album);
 
-        const downloadBtn = document.getElementById('radio-download-btn');
-        if (downloadBtn) {
-            downloadBtn.href = `audio/${track.fullName}.m4a`;
-        }
-
-        const coverImg = document.getElementById('radio-cover-img');
-        if (coverImg) {
-            coverImg.onerror = function() {
-                this.onerror = null;
-                // Ancienne version : this.src = 'covers/cover_default.webp';
-                this.src = 'covers/00a-track-nocode.webp'; // nouvelle version
-            };
-            coverImg.src = `covers/${track.fullName}.webp`;
-        }
-
-        const albumImg = document.getElementById('radio-album-img');
-        if (albumImg) {
-            albumImg.onerror = function() {
-                this.onerror = null;
-                // Ancienne version : this.src = 'assets/artworks/default.webp';
-                this.src = 'covers/00a-album-nocode.webp'; // nouvelle version
-            };
-            if (track.isSingle) {
-                // Ancienne version : albumImg.src = 'assets/artworks/default.webp';
-                albumImg.src = 'covers/00a-album-nocode.webp'; // nouvelle version
-            } else {
-                albumImg.src = `covers/00-${track.album}.webp`; // nouvelle version
-            }
-        }
-
+        resolveRadioDownload(track);
+        updateRadioArtwork(track);
         loadRadioLyrics(track.fullName);
     }
 
-    const radioAudio = document.getElementById('radio-audio');
-    const activeTime = (radioAudio && !radioAudio.paused) ? radioAudio.currentTime : offset;
+    const radioAudio = appState.radioAudio || dom['radio-audio'];
+    const activeTime = radioAudio && !radioAudio.paused
+        ? radioAudio.currentTime
+        : offset;
+
     syncRadioLyrics(activeTime);
 }
 
-function initRadioControls() {
-    let audio = document.getElementById('radio-audio');
-    if (!audio) {
-        audio = document.createElement('audio');
-        audio.id = 'radio-audio';
-        audio.preload = 'none';
-        document.body.appendChild(audio);
+async function resolveRadioDownload(track) {
+    const downloadBtn = dom['radio-download-btn'];
+    if (!downloadBtn) return;
+
+    const source = await resolveAudioSource(track.fullName);
+
+    // Le catalogue peut changer pendant la vérification réseau : ne pas réinjecter une ancienne piste.
+    if (appState.catalogueTracks[appState.currentRadioTrackIndex] !== track) return;
+
+    if (source) {
+        downloadBtn.href = source;
+    } else {
+        downloadBtn.removeAttribute('href');
+    }
+}
+
+async function updateRadioArtwork(track) {
+    const coverImg = dom['radio-cover-img'];
+    const albumImg = dom['radio-album-img'];
+
+    if (coverImg) {
+        await setImageWithFallback(
+            coverImg,
+            `covers/${track.fullName}.webp`,
+            'covers/00a-track-nocode.webp',
+            `track:${track.fullName}`
+        );
     }
 
-    const playBtn = document.getElementById('radio-toggle-btn') || 
-                    document.getElementById('radio-play-btn') || 
-                    document.querySelector('#pave-radio .play-btn') ||
-                    document.querySelector('#pave-radio button');
+    if (albumImg) {
+        const primary = track.isSingle
+            ? 'covers/00a-album-nocode.webp'
+            : `covers/00-${track.album}.webp`;
+
+        await setImageWithFallback(
+            albumImg,
+            primary,
+            'covers/00a-album-nocode.webp',
+            `album:${track.fullName}`
+        );
+    }
+}
+
+function initRadioControls() {
+    const audio = createAudioElement('radio-audio', 'none');
+    appState.radioAudio = audio;
+    audio.volume = readStoredVolume();
+
+    const playBtn = dom['radio-toggle-btn'];
 
     if (playBtn) {
         playBtn.onclick = (e) => {
             e.preventDefault();
+
             if (audio.paused) {
                 startRadioAudio();
             } else {
@@ -495,167 +768,221 @@ function initRadioControls() {
     audio.onended = () => {
         startRadioAudio();
     };
+
+    if (dom['feat-volume']) {
+        dom['feat-volume'].value = audio.volume;
+    }
 }
 
-function startRadioAudio() {
-    const audio = document.getElementById('radio-audio');
-    const playBtn = document.getElementById('radio-toggle-btn') || 
-                    document.getElementById('radio-play-btn') || 
-                    document.querySelector('#pave-radio .play-btn') ||
-                    document.querySelector('#pave-radio button');
-    
-    const badgeOnAir = document.getElementById('radio-badge') || document.querySelector('.live-badge');
+async function startRadioAudio() {
+    const audio = appState.radioAudio || dom['radio-audio'];
+    const playBtn = dom['radio-toggle-btn'];
+    const badgeOnAir = dom['radio-badge'];
     const state = getLiveRadioState();
+    const radioTitle = dom['radio-title-header'];
 
+    if (radioTitle) radioTitle.classList.add('pulsing-text');
     if (!audio || !state) return;
 
-    const featAudio = document.getElementById('featured-audio');
-    if (featAudio && !featAudio.paused) {
-        featAudio.pause();
-    }
+    // Coupe proprement le player Featured avant de lancer la radio.
+    stopFeaturedAudio();
 
-    // Ancienne version : audio.src = `audio/${state.track.fullName}.m4a`;
-    audio.src = `audio/${state.track.fullName}.m4a`; // nouvelle version
-    audio.volume = localStorage.getItem('audioVolume') ? parseFloat(localStorage.getItem('audioVolume')) : 0.8; // nouvelle version
+    const source = await resolveAudioSource(state.track.fullName);
+    if (!source) return;
+
+    appState.radioSource = source;
+    audio.src = source;
+    audio.volume = readStoredVolume();
     audio.currentTime = state.offset;
 
-    audio.onerror = function() {
-        if (this.src.endsWith('.m4a')) {
-            this.src = `audio/${state.track.fullName}.mp3`;
-            this.play().catch(() => {});
-        }
-    };
-
     audio.play().then(() => {
-        if (playBtn) playBtn.classList.add('playing');
+        if (playBtn) {
+            playBtn.classList.add('playing');
+            playBtn.innerHTML = '❚❚';
+        }
+
         if (badgeOnAir) badgeOnAir.classList.add('active');
-        // Ancienne version : (rien)
-        localStorage.setItem('activePlayer', 'radio'); // ajout sauvegarde statut radio
-    }).catch(err => {
-        console.log("Lecture audio radio bloquée ou erreur :", err);
+        localStorage.setItem('activePlayer', 'radio');
+
+        enableRadioDownload();
+    }).catch(() => {
+        // Lecture bloquée ou ressource devenue indisponible : aucun fallback onerror nécessaire.
     });
 }
 
 function stopRadioAudio() {
-    const audio = document.getElementById('radio-audio');
-    const playBtn = document.getElementById('radio-toggle-btn') || 
-                    document.getElementById('radio-play-btn') || 
-                    document.querySelector('#pave-radio .play-btn') ||
-                    document.querySelector('#pave-radio button');
-    const badgeOnAir = document.getElementById('radio-badge') || document.querySelector('.live-badge');
+    const audio = appState.radioAudio || dom['radio-audio'];
+    const playBtn = dom['radio-toggle-btn'];
+    const badgeOnAir = dom['radio-badge'];
+    const radioTitle = dom['radio-title-header'];
 
+    if (radioTitle) radioTitle.classList.remove('pulsing-text');
     if (audio) audio.pause();
-    if (playBtn) playBtn.classList.remove('playing');
+
+    if (playBtn) {
+        playBtn.classList.remove('playing');
+        playBtn.innerHTML = '<span style="margin-left: 6px;">▶</span>';
+    }
+
     if (badgeOnAir) badgeOnAir.classList.remove('active');
-    // Ancienne version : (rien)
-    localStorage.removeItem('activePlayer'); // ajout suppression statut radio
+
+    if (localStorage.getItem('activePlayer') === 'radio') {
+        localStorage.removeItem('activePlayer');
+    }
+
+    disableRadioDownload();
 }
 
-function loadRadioLyrics(trackName) {
-    const srtPath = `lyrics/${trackName}.srt`;
-    
-    // 1. On essaie d'abord le fichier .srt (avec timestamps)
-    fetch(srtPath)
-        .then(res => {
-            if (!res.ok) throw new Error("SRT introuvable");
-            return res.text();
-        })
-        .then(text => {
-            radioSrtData = parseSRT(text);
-        })
-        .catch(() => {
-            // 2. Si pas de SRT, on essaie le .txt de la piste (paroles brutes)
-            return fetch(`lyrics/${trackName}.txt`)
-                .then(res => {
-                    if (!res.ok) throw new Error("TXT introuvable");
-                    return res.text();
-                })
-                .then(text => {
-                    // C'est un simple TXT sans timestamps : on l'affiche en bloc unique permanent
-                    radioSrtData = [{ startSec: 0, endSec: 999999, text: text.trim().replace(/\n/g, '<br>') }];
-                })
-                .catch(() => {
-                    // 3. Dernier recours : le fichier global 00a-lyrics-nocode.txt
-                    return fetch('lyrics/00a-lyrics-nocode.txt')
-                        .then(res => {
-                            if (!res.ok) throw new Error("Secours introuvable");
-                            return res.text();
-                        })
-                        .then(text => {
-                            radioSrtData = [{ startSec: 0, endSec: 999999, text: text.trim().replace(/\n/g, '<br>') }];
-                        });
-                });
-        })
-        .catch(() => {
-            radioSrtData = [{ startSec: 0, endSec: 999999, text: "---" }];
-            const container = document.getElementById('radio-lyrics-container');
-            if (container) container.innerHTML = '<span class="no-lyrics">---</span>';
-        });
+function enableRadioDownload() {
+    const coverImg = dom['radio-cover-img'];
+    if (!coverImg) return;
+
+    coverImg.classList.add('downloadable');
+    coverImg.removeEventListener('click', triggerRadioDownload);
+    coverImg.addEventListener('click', triggerRadioDownload);
+}
+
+function disableRadioDownload() {
+    const coverImg = dom['radio-cover-img'];
+    if (!coverImg) return;
+
+    coverImg.classList.remove('downloadable');
+    coverImg.removeEventListener('click', triggerRadioDownload);
+}
+
+function triggerRadioDownload(e) {
+    e.preventDefault();
+
+    const downloadBtn = dom['radio-download-btn'];
+    if (downloadBtn) downloadBtn.click();
+}
+
+/* ==========================================================
+ * MODULE PAROLES & SYNCHRONISATION (SRT/TXT)
+ * ========================================================== */
+
+async function loadRadioLyrics(trackName) {
+    const srtText = await fetchTextResource(`lyrics/${trackName}.srt`);
+
+    if (srtText !== null) {
+        appState.radioSrtData = parseSRT(srtText);
+        return;
+    }
+
+    const txtText = await fetchTextResource(`lyrics/${trackName}.txt`);
+
+    if (txtText !== null) {
+        appState.radioSrtData = [
+            {
+                startSec: 0,
+                endSec: 999999,
+                text: txtText.trim().replace(/\n/g, '<br>'),
+            },
+        ];
+        return;
+    }
+
+    const fallbackText = await fetchTextResource('lyrics/00a-lyrics-nocode.txt');
+
+    if (fallbackText !== null) {
+        appState.radioSrtData = [
+            {
+                startSec: 0,
+                endSec: 999999,
+                text: fallbackText.trim().replace(/\n/g, '<br>'),
+            },
+        ];
+        return;
+    }
+
+    appState.radioSrtData = [{
+        startSec: 0,
+        endSec: 999999,
+        text: '---',
+    }];
+
+    if (dom['radio-lyrics-container']) {
+        dom['radio-lyrics-container'].innerHTML = '<span class="no-lyrics">---</span>';
+    }
 }
 
 function parseSRT(data) {
     const subtitles = [];
     const blocks = data.replace(/\r/g, '').split('\n\n');
 
-    for (let block of blocks) {
+    for (const block of blocks) {
         const lines = block.split('\n');
-        if (lines.length >= 3) {
-            const timeLine = lines[1];
-            const textLines = lines.slice(2).join('<br>');
-            const times = timeLine.split(' --> ');
+        if (lines.length < 3) continue;
 
-            if (times.length === 2) {
-                const startSec = parseSrtTime(times[0]);
-                const endSec = parseSrtTime(times[1]);
-                subtitles.push({ startSec, endSec, text: textLines });
-            }
-        }
+        const timeLine = lines[1];
+        const textLines = lines.slice(2).join('<br>');
+        const times = timeLine.split(' --> ');
+
+        if (times.length !== 2) continue;
+
+        const startSec = parseSrtTime(times[0]);
+        const endSec = parseSrtTime(times[1]);
+
+        subtitles.push({ startSec, endSec, text: textLines });
     }
+
     return subtitles;
 }
 
 function parseSrtTime(timeStr) {
     const parts = timeStr.split(':');
     if (parts.length < 3) return 0;
+
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
     const secParts = parts[2].split(',');
     const seconds = parseInt(secParts[0], 10);
     const milliseconds = parseInt(secParts[1] || 0, 10);
+
     return (hours * 3600) + (minutes * 60) + seconds + (milliseconds / 1000);
 }
 
 function syncRadioLyrics(currentTime) {
-    const container = document.getElementById('radio-lyrics-container');
+    const container = dom['radio-lyrics-container'];
     if (!container) return;
 
-    if (!radioSrtData.length) {
+    if (!appState.radioSrtData.length) {
         container.innerHTML = '<span class="no-lyrics">...</span>';
         return;
     }
 
-    const currentSub = radioSrtData.find(sub => currentTime >= sub.startSec && currentTime <= sub.endSec);
+    const currentSub = appState.radioSrtData.find(
+        (sub) => currentTime >= sub.startSec && currentTime <= sub.endSec
+    );
 
-    if (currentSub) {
-        if (container.innerHTML !== currentSub.text) {
-            container.innerHTML = currentSub.text;
-        }
-    } else {
-        container.innerHTML = '<span class="no-lyrics">...</span>';
+    const nextHtml = currentSub
+        ? currentSub.text
+        : '<span class="no-lyrics">...</span>';
+
+    if (container.innerHTML !== nextHtml) {
+        container.innerHTML = nextHtml;
     }
 }
 
-// --- COMPTE À REBOURS DYNAMIQUE ---
+/* ==========================================================
+ * MODULES ANNEXES — COMPTE À REBOURS / SCROLL / MINI-JEU
+ * ========================================================== */
+
 function initCountdown(dateString) {
-    const timerElem = document.getElementById('countdown-timer');
+    const timerElem = dom['countdown-timer'];
     if (!timerElem) return;
+
+    if (appState.countdownInterval) {
+        clearInterval(appState.countdownInterval);
+        appState.countdownInterval = null;
+    }
 
     function updateTimer() {
         const now = new Date();
         const target = new Date(dateString);
 
-        if (isNaN(target.getTime()) || target <= now) {
-            timerElem.innerText = "ONLINE NOW";
+        if (Number.isNaN(target.getTime()) || target <= now) {
+            timerElem.innerText = 'ONLINE NOW';
             return;
         }
 
@@ -669,12 +996,17 @@ function initCountdown(dateString) {
         if (seconds < 0) { seconds += 60; minutes--; }
         if (minutes < 0) { minutes += 60; hours--; }
         if (hours < 0) { hours += 24; days--; }
+
         if (days < 0) {
             const prevMonth = new Date(target.getFullYear(), target.getMonth(), 0);
             days += prevMonth.getDate();
             months--;
         }
-        if (months < 0) { months += 12; years--; }
+
+        if (months < 0) {
+            months += 12;
+            years--;
+        }
 
         const units = [
             { val: years, suffix: 'y' },
@@ -682,22 +1014,23 @@ function initCountdown(dateString) {
             { val: days, suffix: 'd' },
             { val: hours, suffix: 'h' },
             { val: minutes, suffix: 'm' },
-            { val: seconds, suffix: 's' }
+            { val: seconds, suffix: 's' },
         ];
 
-        const firstNonZeroIndex = units.findIndex(u => u.val > 0);
+        const firstNonZeroIndex = units.findIndex((unit) => unit.val > 0);
 
         if (firstNonZeroIndex === -1) {
-            timerElem.innerText = "ONLINE NOW";
+            timerElem.innerText = 'ONLINE NOW';
             return;
         }
 
         const activeUnits = units.slice(firstNonZeroIndex);
-
         const formatted = activeUnits
-            .map((u, idx) => {
-                const valStr = (idx > 0 && u.val < 10) ? `0${u.val}` : `${u.val}`;
-                return `${valStr}${u.suffix}`;
+            .map((unit, index) => {
+                const valStr = index > 0 && unit.val < 10
+                    ? `0${unit.val}`
+                    : `${unit.val}`;
+                return `${valStr}${unit.suffix}`;
             })
             .join(' ');
 
@@ -705,117 +1038,122 @@ function initCountdown(dateString) {
     }
 
     updateTimer();
-    setInterval(updateTimer, 1000);
+    appState.countdownInterval = setInterval(updateTimer, 1000);
 }
 
-// Défilement horizontal à la molette de souris sur PC
-document.addEventListener("DOMContentLoaded", () => {
-    const gridContainer = document.querySelector('.grid-container');
-    if (gridContainer) {
-        gridContainer.addEventListener('wheel', (evt) => {
-            if (gridContainer.scrollWidth > gridContainer.clientWidth) {
-                evt.preventDefault();
-                gridContainer.scrollLeft += evt.deltaY;
+function initHorizontalScroll() {
+    const gridContainer = dom.gridContainer;
+    if (!gridContainer) return;
+
+    gridContainer.addEventListener('wheel', (evt) => {
+        if (gridContainer.scrollWidth > gridContainer.clientWidth) {
+            evt.preventDefault();
+            gridContainer.scrollLeft += evt.deltaY;
+        }
+    }, { passive: false });
+}
+
+function initActivePlayerRestore() {
+    const lastPlayer = localStorage.getItem('activePlayer');
+
+    if (lastPlayer === 'radio') {
+        setTimeout(() => {
+            if (typeof startRadioAudio === 'function') {
+                startRadioAudio();
             }
-        }, { passive: false });
+        }, 500);
     }
-});
+}
 
-// Ancienne version : (rien)
-window.addEventListener('DOMContentLoaded', () => { // ajout écouteur de rechargement
-    const lastPlayer = localStorage.getItem('activePlayer'); // ajout récupération dernier lecteur actif
-    if (lastPlayer === 'radio') { // ajout condition pour relancer la radio si elle était active
-        setTimeout(() => { // ajout délai pour laisser le catalogue s'initialiser
-            if (typeof startRadioAudio === 'function') { // ajout vérification de l'existence de la fonction
-                startRadioAudio(); // ajout relance automatique de la radio
-            } // ajout fin if fonction
-        }, 500); // ajout délai de 500ms
-    } // ajout fin if lastPlayer
-}); // ajout fin écouteur rechargement
+function initRetroGame() {
+    const layer = dom['retro-game-layer'];
+    const paddle = dom['retro-paddle'];
 
-document.addEventListener('DOMContentLoaded', () => {
-    const layer = document.getElementById('retro-game-layer');
-    const paddle = document.getElementById('retro-paddle');
-    
     if (!paddle || !layer) return;
 
-    // Liste des symboles validés
-    const emojis = ['🚀', '🔥', '☣️', '👎', '⚡', '🧬', '💔', '🧲', '🐧', '⏳'];
+    const emojis = ['🚀', '🔥', '☣️', '👎', '⚡', '🧬', '💔', '🧲', '🐧', '⏳', '💜', '💖', '💕'];
 
-    // Animation de va-et-vient dans les limites du conteneur parent
     let posX = layer.clientWidth / 2;
-    let direction = 2; // Vitesse de déplacement
+    let direction = 2;
+    let fireInterval = null;
 
     function movePaddle() {
         const parentWidth = layer.clientWidth;
         const paddleWidth = paddle.offsetWidth;
-        
+
         posX += direction;
 
         if (posX - paddleWidth / 2 <= 0 || posX + paddleWidth / 2 >= parentWidth) {
             direction *= -1;
         }
 
-        paddle.style.left = posX + 'px';
+        paddle.style.left = `${posX}px`;
         requestAnimationFrame(movePaddle);
     }
-    requestAnimationFrame(movePaddle);
 
-    // Fonction de tir unique
     function shootEmoji() {
-        const bullet = document.createElement('div');
-        bullet.className = 'retro-bullet';
-        bullet.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-        
-        const paddleRect = paddle.getBoundingClientRect();
-        const layerRect = layer.getBoundingClientRect();
-        
-        const relativeLeft = (paddleRect.left - layerRect.left) + (paddleRect.width / 2) + (Math.random() * 40 - 20);
-        
-        bullet.style.left = relativeLeft + 'px';
-        bullet.style.bottom = '230px'; 
-        
-        layer.appendChild(bullet);
+        const count = Math.floor(Math.random() * 3) + 1;
 
-        setTimeout(() => {
-            bullet.remove();
-        }, 1200);
+        for (let i = 0; i < count; i++) {
+            const bullet = document.createElement('div');
+            bullet.className = 'retro-bullet';
+            bullet.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+            const paddleRect = paddle.getBoundingClientRect();
+            const layerRect = layer.getBoundingClientRect();
+
+            const relativeLeft =
+                (paddleRect.left - layerRect.left) +
+                (paddleRect.width / 2) +
+                (Math.random() * 60 - 30);
+
+            bullet.style.left = `${relativeLeft}px`;
+            bullet.style.bottom = '230px';
+            layer.appendChild(bullet);
+
+            setTimeout(() => bullet.remove(), 1200);
+        }
     }
 
-    let fireInterval = null;
-
-    // Démarrer la rafale au clic enfoncé
-    paddle.addEventListener('mousedown', (e) => {
+    function startFiring(e) {
         e.stopPropagation();
         if (fireInterval) return;
-        
+
         shootEmoji();
         fireInterval = setInterval(shootEmoji, 120);
-        
-        paddle.style.boxShadow = '0 0 20px #ff3333';
-        paddle.style.borderColor = '#ff3333';
-    });
+        paddle.style.boxShadow = '0 0 30px var(--accent-fuchsia)';
+    }
 
-    // Arrêter la rafale quand on relève la souris ou qu'on sort de la raquette
-    const stopFiring = () => {
-        if (fireInterval) {
-            clearInterval(fireInterval);
-            fireInterval = null;
-            paddle.style.boxShadow = '0 0 10px var(--accent-teal)';
-            paddle.style.borderColor = 'var(--accent-fuchsia)';
-        }
-    };
+    function stopFiring() {
+        if (!fireInterval) return;
 
+        clearInterval(fireInterval);
+        fireInterval = null;
+        paddle.style.boxShadow = '0 0 10px var(--accent-teal)';
+        paddle.style.borderColor = 'var(--accent-fuchsia)';
+    }
+
+    requestAnimationFrame(movePaddle);
+
+    paddle.addEventListener('mousedown', startFiring);
     paddle.addEventListener('mouseup', stopFiring);
     paddle.addEventListener('mouseleave', stopFiring);
 
-    // Support tactile simple sans bloquer la page
     paddle.addEventListener('touchstart', (e) => {
         e.stopPropagation();
         if (fireInterval) return;
+
         shootEmoji();
         fireInterval = setInterval(shootEmoji, 120);
     });
 
     paddle.addEventListener('touchend', stopFiring);
+}
+
+/* ==========================================================
+ * ÉCOUTEUR DOMCONTENTLOADED UNIQUE
+ * ========================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
 });
