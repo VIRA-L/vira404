@@ -1258,3 +1258,13 @@ function initRetroGame() {
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
 });
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        // Force la mise à jour complète de la radio (piste, UI, paroles)
+        // au moment exact où l'utilisateur revient sur la page.
+        if (typeof updateRadioPassiveUI === 'function') {
+            updateRadioPassiveUI();
+        }
+    }
+});
