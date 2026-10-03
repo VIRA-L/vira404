@@ -2,7 +2,7 @@
 
 [LANDING]
 title = "VIRA404"
-artwork = "index.webp" 
+artwork = "assets/index.webp" 
 link1text = "☣️YTube🎞️"
 link1page = "https://www.youtube.com/@vira_l_music"
 link2text = "💔Insta📸"
@@ -27,12 +27,12 @@ caption3 = "\n"
 [FEATURED]
 track = "Не гаси — alternative rock [RU] · Vira L."
 caption = "Не гаси — alternative rock [RU] is out! \n\nVira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀\n#Cyberworld #Unsubscribe #NoCodeGirl"
-artwork = "featured.webp" 
+artwork = "covers/Не гаси — alternative rock [RU] · Vira L..webp" 
 date = "22.09.2025"
 
 [WORKING]
 title = "ЗООДИАК\nNew album | новый альбом"
 caption1 = "Vira L. is 🐀 Neural. Lethal. Primal.🐉 She holds the scalpel.👎\nЗоопарк скоро откроется #Zootechnics #NoCodeGirl #Unsubscribe"
 caption2 = "\n\n23.09.2026 - finished КРЫСА — alt rock [RU]\n\n30.09.2026 - Track 02 - work in progress..."
-artwork = "working.webp" 
+artwork = "assets/working.webp" 
 date = "2144-12-31T18:00:00Z"

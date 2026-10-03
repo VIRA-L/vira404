@@ -40,7 +40,7 @@ html, body {
     overflow: hidden;
     background-color: #000;
     position: relative;
-    background-image: url('Fond.webp');
+    background-image: url('assets/Fond.webp');
     background-size: 75% 100%;
     background-position: right top;
     background-repeat: no-repeat;
