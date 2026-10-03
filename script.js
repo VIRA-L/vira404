@@ -952,6 +952,11 @@ function parseSRT(data) {
 
 /**  * Chargeur avec distinction explicite entre SRT (horodaté) et TXT (brut) */
 async function loadRadioLyrics(trackName) {
+    appState.radioSrtData = [];
+    if (dom['radio-lyrics-container']) {
+        dom['radio-lyrics-container'].dataset.lastState = '';
+    }
+
     const srtText = await fetchTextResource(`lyrics/${trackName}.srt`);
 
     if (srtText !== null) {
@@ -1261,7 +1266,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-        appState.currentRadioTrackIndex = -1;
         if (typeof updateRadioPassiveUI === 'function') {
             updateRadioPassiveUI();
         }
