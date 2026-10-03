@@ -52,7 +52,6 @@ function cacheDom() {
         'pave-landing',
         'radio-audio',
         'radio-toggle-btn',
-        'radio-badge',
         'radio-title-header',
         'radio-cover-img',
         'radio-download-btn',
@@ -777,7 +776,6 @@ function initRadioControls() {
 async function startRadioAudio() {
     const audio = appState.radioAudio || dom['radio-audio'];
     const playBtn = dom['radio-toggle-btn'];
-    const badgeOnAir = dom['radio-badge'];
     const state = getLiveRadioState();
     const radioTitle = dom['radio-title-header'];
 
@@ -801,7 +799,6 @@ async function startRadioAudio() {
             playBtn.innerHTML = '❚❚';
         }
 
-        if (badgeOnAir) badgeOnAir.classList.add('active');
         localStorage.setItem('activePlayer', 'radio');
 
         enableRadioDownload();
@@ -813,7 +810,6 @@ async function startRadioAudio() {
 function stopRadioAudio() {
     const audio = appState.radioAudio || dom['radio-audio'];
     const playBtn = dom['radio-toggle-btn'];
-    const badgeOnAir = dom['radio-badge'];
     const radioTitle = dom['radio-title-header'];
 
     if (radioTitle) radioTitle.classList.remove('pulsing-text');
@@ -823,8 +819,6 @@ function stopRadioAudio() {
         playBtn.classList.remove('playing');
         playBtn.innerHTML = '<span style="margin-left: 6px;">▶</span>';
     }
-
-    if (badgeOnAir) badgeOnAir.classList.remove('active');
 
     if (localStorage.getItem('activePlayer') === 'radio') {
         localStorage.removeItem('activePlayer');
@@ -1178,19 +1172,32 @@ function initRetroGame() {
     if (!paddle || !layer) return;
 
     const emojis = ['🚀', '🔥', '☣️', '👎', '⚡', '🧬', '💔', '🧲', '🐧', '⏳', '💜', '💖', '💕'];
-
+    const autoEmojis = ['🖤', '☠️', '🎸', '🤘', '⛓️', '💋', '🩸'];  
     let posX = layer.clientWidth / 2;
-    let direction = 2;
+    let moveSign = 1; // 1 pour la droite, -1 pour la gauche
     let fireInterval = null;
 
     function movePaddle() {
         const parentWidth = layer.clientWidth;
         const paddleWidth = paddle.offsetWidth;
 
-        posX += direction;
+        let currentVolume = 0.8; // Valeur par défaut
+        if (dom['feat-volume']) {
+            currentVolume = parseFloat(dom['feat-volume'].value) || 0;
+        }
 
-        if (posX - paddleWidth / 2 <= 0 || posX + paddleWidth / 2 >= parentWidth) {
-            direction *= -1;
+        const minSpeed = 1;
+        const maxSpeed = 6;
+        const speed = minSpeed + (currentVolume * (maxSpeed - minSpeed));
+
+        posX += moveSign * speed;
+
+        if (posX - paddleWidth / 2 <= 0) {
+            moveSign = 1;
+            posX = paddleWidth / 2; // Force la sortie du bord
+        } else if (posX + paddleWidth / 2 >= parentWidth) {
+            moveSign = -1;
+            posX = parentWidth - paddleWidth / 2; // Force la sortie du bord
         }
 
         paddle.style.left = `${posX}px`;
@@ -1239,6 +1246,31 @@ function initRetroGame() {
         paddle.style.borderColor = 'var(--accent-fuchsia)';
     }
 
+    function shootAutoEmoji() {
+        // Génère 0, 1 ou 2 (au lieu de 1 à 3)
+        const count = Math.floor(Math.random() * 3); 
+
+        for (let i = 0; i < count; i++) {
+            const bullet = document.createElement('div');
+            bullet.className = 'retro-bullet';
+            bullet.textContent = autoEmojis[Math.floor(Math.random() * autoEmojis.length)];
+
+            const paddleRect = paddle.getBoundingClientRect();
+            const layerRect = layer.getBoundingClientRect();
+
+            const relativeLeft =
+                (paddleRect.left - layerRect.left) +
+                (paddleRect.width / 2) +
+                (Math.random() * 60 - 30);
+
+            bullet.style.left = `${relativeLeft}px`;
+            bullet.style.bottom = '230px';
+            layer.appendChild(bullet);
+
+            setTimeout(() => bullet.remove(), 1200);
+        }
+    }    
+
     requestAnimationFrame(movePaddle);
 
     paddle.addEventListener('mousedown', startFiring);
@@ -1254,6 +1286,19 @@ function initRetroGame() {
     });
 
     paddle.addEventListener('touchend', stopFiring);
+    function scheduleNextAutoFire() {
+        // Définir la fourchette de temps (ex: entre 800ms et 3500ms)
+        const minDelay = 500;
+        const maxDelay = 2500;
+        const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+
+        setTimeout(() => {
+            shootAutoEmoji();
+            scheduleNextAutoFire(); // Relance le minuteur pour le prochain tir
+        }, randomDelay);
+    }
+
+    scheduleNextAutoFire();
 }
 
 /* ==========================================================

@@ -2,7 +2,7 @@
 
 [LANDING]
 title = "VIRA404"
-artwork = "assets/index.webp" 
+artwork = "assets/index1.webp" 
 link1text = "☣️YTube🎞️"
 link1page = "https://www.youtube.com/@vira_l_music"
 link2text = "💔Insta📸"
