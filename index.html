@@ -1,11 +1,31 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vira L. — Landing Page</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="content-language" content="en">
+
+    <title>Vira L NoCodeGirl Official — Dark Pop Music</title>
+    <meta name="description" content="Enter the Official NoCodeGirl's world. Alt-metal & dark pop by Vira L. · CTRL-ALT-ME · VIRA:L · SOFIA · Пропаганда · Ghost in the Label · Everyone at Once · ЗООДИАК">
+    <link rel="canonical" href="https://vira404.com/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Vira L NoCodeGirl Official — Dark Pop Music">
+    <meta property="og:description" content="Enter the Official NoCodeGirl's world. Alt-metal & dark pop by Vira L. · CTRL-ALT-ME · VIRA:L · SOFIA · Пропаганда · Ghost in the Label · Everyone at Once · ЗООДИАК">
+    <meta property="og:image" content="https://vira404.com/assets/vira-l-nocodegirl-vira404-official.webp"> 
+    <meta property="og:url" content="https://vira404.com/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vira L (NoCodeGirl) Official — Dark Alt-Pop Music">
+    <meta name="twitter:description" content="Official website of alternative rock artist Vira L (NoCodeGirl). Stream VIRA404.">
+    <meta name="twitter:image" content="https://vira404.com/assets/vira-l-nocodegirl-vira404-official.webp">
+
+    <link rel="stylesheet" href="vira404-dark-alt-pop-style.css">
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/nocodegirl-thumbdown-emblem.png">
+    <link rel="shortcut icon" type="image/png" sizes="48x48" href="assets/nocodegirl-thumbdown-emblem.png">
+
 </head>
+
 <body>
 
     <!-- Conteneur global des 4 pavés -->
@@ -13,6 +33,15 @@
 
         <!-- PAVÉ 1 : Module Libre (Landing / Config) -->
         <section class="pave pave-1" id="pave-landing">
+            <div class="artwork-box" id="landing-artwork-container">
+                <img id="landing-cover-img" src="" 
+                     alt="Portrait of red-haired female singer Vira L. (NoCodeGirl), alternative digital rock artist in leather jacket, VIRA404 Official" class="bg-artwork-img"
+                     width="480"
+                     height="1080"
+                     loading="eager"
+                     fetchpriority="high"
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
             <div class="pave-content">
                 <div class="pave-header">
                     <!-- Switch de langue (EN actif par défaut) -->
@@ -41,7 +70,7 @@
 
         <!-- 1. Le Header en haut -->
         <div class="pave-header">
-            <h3 id="radio-title-header">LIVE RADIO</h3>
+            <h2 id="radio-title-header">LIVE RADIO</h2>
         </div>
 
         <!-- 2. Le conteneur de paroles au milieu -->
@@ -61,9 +90,9 @@
             </div>
 
             <div class="radio-controls-row">
-                <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Cover Morceau" />
-                <button id="radio-toggle-btn" class="btn-ctrl" title="Lecture / Pause"><span style="margin-left: 4px;">▶</span></button>
-                <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Cover Album" />
+                <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Viral radio live stream track cover and dark aesthetics, copper-haired singer" />
+                <button id="radio-toggle-btn" class="btn-ctrl" aria-label="Play or pause radio stream"><span style="margin-left: 4px;">▶</span></button>
+                <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Official VIRA404 music player artwork, NoCodeGirl thumbdown emblem or album cover." />
             </div>
         </div>
 
@@ -75,20 +104,22 @@
         <section class="pave pave-3" id="pave-featured">
             <div class="pave-content">
                 <div class="pave-header">
-                    <h3 id="featured-title-header">FEATURED</h3>
+                    <h2 id="featured-title-header">FEATURED</h2>
                     <p id="featured-date" class="featured-date"></p>
                     <p id="featured-caption"></p>
                 </div>
 
-                <div class="artwork-box" id="featured-artwork-container"></div>
+                <div class="artwork-box" id="featured-artwork-container">
+                    <img id="featured-cover-img" src="" alt="Dark alt-rock cover artwork capturing the rebellious vibe of Vira L.'s latest single drop." class="bg-artwork-img">
+               </div>
 
                 <div class="pave-footer">
                     <h4 id="featured-track-title"></h4>
                     <div class="custom-parser-controls">
-                        <button id="feat-rewind" class="btn-mini" title="Reculer 10s">⏮</button>
-                        <button id="feat-play" class="btn-mini" title="Lecture / Pause">▶</button>
-                        <button id="feat-forward" class="btn-mini" title="Avancer 10s">⏭</button>
-                        <button id="feat-loop" class="btn-mini" title="Lecture en boucle">↻</button>
+                        <button id="feat-rewind" class="btn-mini" title="Rewind">⏮</button>
+                        <button id="feat-play" class="btn-mini" title="Play / Pause">▶</button>
+                        <button id="feat-forward" class="btn-mini" title="Forward">⏭</button>
+                        <button id="feat-loop" class="btn-mini" title="Loop">↻</button>
                         <input type="range" id="feat-seek" value="0" max="100" title="Position">
                         <input type="range" id="feat-volume" min="0" max="1" step="0.01" value="0.8" title="Volume">
                     </div>
@@ -102,13 +133,15 @@
         <section class="pave pave-4" id="pave-working">
             <div class="pave-content">
                 <div class="pave-header">
-                    <h3>WORKING</h3>
+                    <h2>WORKING</h2>
                     <h4 id="working-title"></h4>
                     <p id="working-caption1"></p>
                     <p id="working-caption2"></p>
                 </div>
 
-                <div class="artwork-box" id="working-artwork-container"></div>
+                <div class="artwork-box" id="working-artwork-container">
+                    <img id="working-cover-img" src="" alt="Music cover art, featuring the young copper-haired female singer NoCodeGirl." class="bg-artwork-img">
+                </div>
 
                 <div class="pave-footer">
                     <div id="countdown-timer">00j 00h 00m 00s</div>
@@ -118,6 +151,6 @@
 
     </main>
 
-    <script src="script.js"></script>
+    <script src="vira404-dark-alt-pop-script.js"></script>
 </body>
 </html>
