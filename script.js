@@ -1261,8 +1261,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-        // Force la mise à jour complète de la radio (piste, UI, paroles)
-        // au moment exact où l'utilisateur revient sur la page.
+        appState.currentRadioTrackIndex = -1;
         if (typeof updateRadioPassiveUI === 'function') {
             updateRadioPassiveUI();
         }
