@@ -247,7 +247,6 @@ async function initApp() {
 
     initHorizontalScroll();
     initActivePlayerRestore();
-    initRetroGame();
 }
 
 /* ==========================================================
@@ -1313,6 +1312,14 @@ function initRetroGame() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
+});
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        if (typeof initRetroGame === 'function') {
+            initRetroGame();
+        }
+    }, 1000);
 });
 
 document.addEventListener('visibilitychange', () => {
