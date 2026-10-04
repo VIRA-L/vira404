@@ -57,14 +57,14 @@
 </head>
 
 <body>
-
+<body class="lang-en">
     <!-- Conteneur global des 4 pavés -->
     <main class="grid-container">
 
         <!-- PAVÉ 1 : Module Libre (Landing / Config) -->
         <section class="pave pave-1" id="pave-landing">
             <div class="artwork-box" id="landing-artwork-container">
-                <img id="landing-cover-img" src="" 
+                <img id="landing-cover-img" src="assets/vira-l-nocodegirl-vira404-official.webp" 
                      alt="Portrait of red-haired female singer Vira L. (NoCodeGirl), alternative digital rock artist in leather jacket, VIRA404 Official" class="bg-artwork-img"
                      width="480"
                      height="1080"
@@ -80,79 +80,99 @@
                         <span>|</span>
                         <button id="btn-lang-ru" class="btn-lang">RU</button>
                     </div>
-                    <h2 id="landing-title"></h2>
-                    <p id="landing-subtitle"></p>
+                    <h2 id="landing-title">
+                        <span class="lang-txt lang-en">VIRA404</span>
+                        <span class="lang-txt lang-ru">ВИРА404</span>
+                    </h2>
+                    <p id="landing-subtitle">
+                        <span class="lang-txt lang-en">#NoCodeGirl is Vira L.</span>
+                        <span class="lang-txt lang-ru">#NoCodeGirl — это Vira L.</span>
+                    </p>
                     <p id="landing-caption1"></p>
-                    <p id="landing-caption2"></p>
+                    <p id="landing-caption2">
+                        <span class="lang-txt lang-en">Alternative rock, cyberpunk pop<br>and Russian digital rock<br>from the edge of the system.</span>
+                        <span class="lang-txt lang-ru">Альтернативный рок, киберпанк-поп<br>и русский диджитал-рок<br>на грани системы.</span>
+                    </p>
                     <p id="landing-caption3"></p>
-<h1>
-    <img src="assets/vira-l-official-red-signature.webp" 
-         alt="Vira L. (NoCodeGirl)" 
-         width="250" 
-         height="134" 
-         loading="eager"
-         style="width: 120px; height: auto; display: block;">
-</h1>
+                    <h1>
+                        <img src="assets/vira-l-official-red-signature.webp" 
+                             alt="Vira L. (NoCodeGirl)" 
+                             width="250" 
+                             height="134" 
+                             loading="eager"
+                             style="width: 120px; height: auto; display: block;">
+                    </h1>
                 </div>
                 <div class="pave-footer" id="landing-links"></div>
             </div>
         </section>
 
         <!-- PAVÉ 2 : Live Radio -->
-<section class="pave pave-2" id="pave-radio">
-    <div class="pave-content">
-        <!-- Calque du mini-jeu spécifique au Pavé 2 -->
-        <div id="retro-game-layer">
-            <div id="retro-paddle"></div>
-        </div>
-
-        <!-- 1. Le Header en haut -->
-        <div class="pave-header">
-            <h2 id="radio-title-header">LIVE RADIO</h2>
-        </div>
-
-        <!-- 2. Le conteneur de paroles au milieu -->
-        <div id="radio-lyrics-container" class="radio-lyrics">---</div>
-        <a id="radio-download-btn" style="display:none;" href="" download></a>
-
-        <!-- 3. Le footer en bas -->
-        <div class="pave-footer">
-            <div class="radio-meta-grid">
-                <div class="radio-meta-left">
-                    <h4 id="radio-track-title"></h4>
-                    <p id="radio-track-info"></p>
+        <section class="pave pave-2" id="pave-radio">
+            <div class="pave-content">
+                <!-- Calque du mini-jeu spécifique au Pavé 2 -->
+                <div id="retro-game-layer">
+                    <div id="retro-paddle"></div>
                 </div>
-                <div class="radio-meta-right">
-                    <p id="radio-album-name"></p>
+
+                <!-- 1. Le Header en haut -->
+                <div class="pave-header">
+                    <h2 id="radio-title-header">
+                        <span class="lang-txt lang-en">LIVE RADIO</span>
+                        <span class="lang-txt lang-ru">ПРЯМОЙ ЭФИР</span>
+                    </h2>
+                    <h3></h3>
                 </div>
-            </div>
 
-            <div class="radio-controls-row">
-                <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Viral radio live stream track cover and dark aesthetics, copper-haired singer" />
-                <button id="radio-toggle-btn" class="btn-ctrl" aria-label="Play or pause radio stream"><span style="margin-left: 4px;">▶</span></button>
-                <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Official VIRA404 music player artwork, NoCodeGirl thumbdown emblem or album cover." />
-            </div>
-        </div>
+                <!-- 2. Le conteneur de paroles au milieu -->
+                <div id="radio-lyrics-container" class="radio-lyrics">---</div>
+                <a id="radio-download-btn" style="display:none;" href="" download></a>
 
-        <audio id="radio-audio" preload="none"></audio>
-    </div>
-</section>
+                <!-- 3. Le footer en bas -->
+                <div class="pave-footer">
+                    <div class="radio-meta-grid">
+                        <div class="radio-meta-left">
+                            <h3 id="radio-track-title"></h3>
+                            <p id="radio-track-info"></p>
+                        </div>
+                        <div class="radio-meta-right">
+                            <p id="radio-album-name"></p>
+                        </div>
+                    </div>
+
+                    <div class="radio-controls-row">
+                        <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Viral radio live stream track cover and dark aesthetics, copper-haired singer" />
+                        <button id="radio-toggle-btn" class="btn-ctrl" aria-label="Play or pause radio stream"><span style="margin-left: 4px;">▶</span></button>
+                        <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Official VIRA404 music player artwork, NoCodeGirl thumbdown emblem or album cover." />
+                    </div>
+                </div>
+
+                <audio id="radio-audio" preload="none"></audio>
+            </div>
+        </section>
 
         <!-- PAVÉ 3 : Featured Drop -->
         <section class="pave pave-3" id="pave-featured">
             <div class="pave-content">
                 <div class="pave-header">
-                    <h2 id="featured-title-header">FEATURED</h2>
-                    <p id="featured-date" class="featured-date"></p>
-                    <p id="featured-caption"></p>
+                    <h2 id="featured-title-header">
+                        <span class="lang-txt lang-en">FEATURED</span>
+                        <span class="lang-txt lang-ru">РЕЛИЗ</span>
+                    </h2>
+                    <h3></h3>
+                    <p id="featured-date" class="featured-date">22.09.2025</p>
+                    <p id="featured-caption">
+                        <span class="lang-txt lang-en">Не гаси — alternative rock [RU] is out!<br><br>Vira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀<br>#Cyberworld #Unsubscribe #NoCodeGirl</span>
+                        <span class="lang-txt lang-ru">Не гаси — alternative rock [RU] вышел!<br><br>Vira L. 🔥 Дерзко. Неостановимо. Вирусно. 🚀<br>#Cyberworld #Unsubscribe #NoCodeGirl</span>
+                    </p>
                 </div>
 
                 <div class="artwork-box" id="featured-artwork-container">
-                    <img id="featured-cover-img" src="" alt="Dark alt-rock cover artwork capturing the rebellious vibe of Vira L.'s latest single drop." class="bg-artwork-img">
+                    <img id="featured-cover-img" src="covers/Не гаси — alternative rock [RU] · Vira L..webp" alt="Dark alt-rock cover artwork capturing the rebellious vibe of Vira L.'s latest single drop." class="bg-artwork-img">
                </div>
 
                 <div class="pave-footer">
-                    <h4 id="featured-track-title"></h4>
+                    <h4 id="featured-track-title">Не гаси — alternative rock [RU] · Vira L.</h4>
                     <div class="custom-parser-controls">
                         <button id="feat-rewind" class="btn-mini" title="Rewind">⏮</button>
                         <button id="feat-play" class="btn-mini" title="Play / Pause">▶</button>
@@ -171,14 +191,27 @@
         <section class="pave pave-4" id="pave-working">
             <div class="pave-content">
                 <div class="pave-header">
-                    <h2>WORKING</h2>
-                    <h4 id="working-title"></h4>
-                    <p id="working-caption1"></p>
-                    <p id="working-caption2"></p>
+                    <h2>
+                        <span class="lang-txt lang-en">WORKING</span>
+                        <span class="lang-txt lang-ru">В РАБОТЕ</span>
+                    </h2>
+                    <h3></h3>
+                    <h4 id="working-title">
+                        <span class="lang-txt lang-en">ЗООДИАК<br>New album</span>
+                        <span class="lang-txt lang-ru">ЗООДИАК<br>Новый альбом</span>
+                    </h4>
+                    <p id="working-caption1">
+                        <span class="lang-txt lang-en">Vira L. is 🐀 Neural. Lethal. Primal.🐉 She holds the scalpel.👎<br>Zootechnics soon #Zootechnics #NoCodeGirl #Unsubscribe</span>
+                        <span class="lang-txt lang-ru">Vira L. 🐀 Нейронно. Смертельно. Первобытно.🐉<br>Зоопарк скоро откроется #Zootechnics #NoCodeGirl #Unsubscribe</span>
+                    </p>
+                    <p id="working-caption2">
+                        <span class="lang-txt lang-en">23.09.2026 - finished КРЫСА — alt rock [RU]<br><br>30.09.2026 - Track 02 - work in progress...</span>
+                        <span class="lang-txt lang-ru">23.09.2026 - готово КРЫСА — alt rock [RU]<br><br>30.09.2026 - Трек 02 - в работе...</span>
+                    </p>
                 </div>
 
                 <div class="artwork-box" id="working-artwork-container">
-                    <img id="working-cover-img" src="" alt="Music cover art, featuring the young copper-haired female singer NoCodeGirl." class="bg-artwork-img">
+                    <img id="working-cover-img" src="assets/working.webp" alt="Music cover art, featuring the young copper-haired female singer NoCodeGirl." class="bg-artwork-img">
                 </div>
 
                 <div class="pave-footer">

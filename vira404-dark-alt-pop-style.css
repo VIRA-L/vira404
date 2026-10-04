@@ -29,6 +29,11 @@ html, body {
     overflow: hidden;
 }
 
+/* MULTILINGUAL SWITCH */
+.lang-ru {display: none;}
+html[lang="ru"] .lang-en {display: none;}
+html[lang="ru"] .lang-ru {display: inline;}
+
 /* ==========================================================
  * 02. GRILLE PRINCIPALE & LAYOUT GLOBAL
  * ========================================================== */
@@ -77,6 +82,7 @@ html, body {
 }
 
 .pave-header p,
+.pave-header h3,
 .pave-header h4 {
     text-align: left;
     margin-bottom: 5px;
