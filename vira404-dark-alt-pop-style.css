@@ -135,6 +135,14 @@ html[lang="ru"] .lang-ru {display: inline;}
     font-weight: 600; 
 }
 
+.nocodegirl-accent {
+    color: var(--accent-fuchsia);
+}
+
+.nocodegirl-code {
+    color: var(--accent-teal);
+}
+
 #pave-landing .pave-footer {
     position: absolute;
     bottom: 20px;
@@ -155,10 +163,16 @@ html[lang="ru"] .lang-ru {display: inline;}
     margin-right: auto;
 }
 
-.social-grid .social-btn:nth-child(1) { --btn-color: var(--accent-teal); }
-.social-grid .social-btn:nth-child(2) { --btn-color: var(--accent-teal); }
-.social-grid .social-btn:nth-child(3) { --btn-color: var(--accent-fuchsia); }
-.social-grid .social-btn:nth-child(4) { --btn-color: var(--warning-yellow); }
+.landing-signature {
+    grid-column: 1 / -1;
+    justify-self: center;
+    margin-bottom: 8px;
+}
+
+.social-grid .social-btn:nth-of-type(1) { --btn-color: var(--accent-fuchsia); }
+.social-grid .social-btn:nth-of-type(2) { --btn-color: var(--accent-fuchsia); }
+.social-grid .social-btn:nth-of-type(3) { --btn-color: var(--accent-teal); }
+.social-grid .social-btn:nth-of-type(4) { --btn-color: var(--warning-yellow); }
 
 .social-btn {
     display: flex;
@@ -173,7 +187,12 @@ html[lang="ru"] .lang-ru {display: inline;}
     text-decoration: none;
     aspect-ratio: 4 / 5;     
     box-sizing: border-box;
-    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s, box-shadow 0.2s, filter 0.2s, opacity 0.2s;
+}
+
+.social-grid .social-btn:nth-of-type(-n+3) {
+    filter: grayscale(1);
+    opacity: 0.7;
 }
 
 .social-icon {
@@ -209,6 +228,11 @@ html[lang="ru"] .lang-ru {display: inline;}
     transform: translateY(-2px);
 }
 
+.social-grid .social-btn:nth-of-type(-n+3):hover {
+    filter: grayscale(0);
+    opacity: 1;
+}
+
 /* ==========================================================
  * 04. PAVÉ 2 — RADIO, KARAOKÉ & MINI-JEU
  * ========================================================== */
@@ -224,6 +248,17 @@ html[lang="ru"] .lang-ru {display: inline;}
     justify-content: space-between;
 }
 
+#pave-radio {
+    --radio-controls-gap: clamp(8px, 3vw, 15px);
+    --radio-cover-size: calc((100vw - 40px - 75px - var(--radio-controls-gap) - var(--radio-controls-gap)) / 2);
+}
+
+@media (min-width: 1025px) {
+    #pave-radio {
+        --radio-cover-size: calc((25vw - 40px - 75px - var(--radio-controls-gap) - var(--radio-controls-gap)) / 2);
+    }
+}
+
 #pave-radio .pave-header {
     position: absolute !important;
     top: 25px !important;
@@ -236,7 +271,7 @@ html[lang="ru"] .lang-ru {display: inline;}
 #radio-lyrics-container {
     position: absolute !important;
     top: 100px !important;
-    bottom: 250px !important;
+    bottom: calc(var(--radio-cover-size) + 155px) !important;
     left: 20px !important;
     right: 20px !important;
     width: auto !important;
@@ -257,6 +292,134 @@ html[lang="ru"] .lang-ru {display: inline;}
     flex-direction: column; /* RAJOUT KARAOKE */
     justify-content: center; /* RAJOUT KARAOKE */
     align-items: center; /* RAJOUT KARAOKE */
+}
+
+#radio-playlist-drawer {
+    position: absolute;
+    top: 100px;
+    left: 20px;
+    right: 20px;
+    height: 30px;
+    overflow: hidden;
+    z-index: 3;
+    border: 1px solid rgba(163, 53, 171, 0.8);
+    border-radius: 14px;
+    background: rgba(10, 10, 10, 0.8);
+    transition: height 180ms ease;
+    cursor: grab;
+    touch-action: none;
+}
+
+#radio-playlist-drawer:active {
+    cursor: grabbing;
+}
+
+#radio-playlist-drawer.is-open[data-visible-count="3"] {
+    height: 162px;
+}
+
+#radio-playlist-drawer.is-open[data-visible-count="5"] {
+    height: 250px;
+}
+
+#radio-playlist-handle {
+    width: 100%;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: grab;
+    touch-action: none;
+}
+
+#radio-playlist-handle:active {
+    cursor: grabbing;
+}
+
+.radio-playlist-grip {
+    width: 28px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent-teal);
+    box-shadow: 0 0 6px var(--accent-teal);
+}
+
+#radio-playlist-tracks {
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px 6px;
+}
+
+.radio-playlist-track {
+    min-width: 0;
+    min-height: 42px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-content: center;
+    column-gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.7rem;
+    line-height: 1.25;
+}
+
+.radio-playlist-track.is-current {
+    color: #fff;
+}
+
+.radio-playlist-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.radio-playlist-details {
+    grid-column: 1 / -1;
+    overflow: hidden;
+    color: var(--text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.65rem;
+}
+
+#radio-game-scores {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: calc(var(--radio-cover-size) + 119px);
+    z-index: 4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 24px;
+    padding: 2px 10px;
+    border: 1px solid var(--border-card);
+    border-radius: 8px;
+    background: rgba(10, 10, 10, 0.85);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.radio-game-score {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.radio-game-score strong {
+    color: var(--accent-teal);
+    font-variant-numeric: tabular-nums;
 }
 
 /* [04. PAVÉ 2] Gestion des lignes du Karaoké & Modes SRT/TXT */
@@ -319,7 +482,7 @@ html[lang="ru"] .lang-ru {display: inline;}
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-end !important;
-    width: 85% !important;
+    width: 100% !important;
     margin-bottom: 8px !important;
 }
 
@@ -328,7 +491,9 @@ html[lang="ru"] .lang-ru {display: inline;}
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
-    max-width: 60%;
+    flex: 0 1 50%;
+    min-width: 0;
+    max-width: 50%;
 }
 
 .radio-meta-right {
@@ -336,10 +501,13 @@ html[lang="ru"] .lang-ru {display: inline;}
     flex-direction: column;
     align-items: flex-end;
     text-align: right;
-    max-width: 35%;
+    flex: 0 1 50%;
+    min-width: 0;
+    max-width: 50%;
 }
 
 #radio-track-title {
+    width: 100%;
     font-size: 1rem;
     font-weight: 800;
     color: #ffffff;
@@ -351,6 +519,7 @@ html[lang="ru"] .lang-ru {display: inline;}
 }
 
 #radio-track-info {
+    width: 100%;
     font-size: 0.75rem;
     color: var(--text-muted);
     text-align: left !important;
@@ -358,6 +527,7 @@ html[lang="ru"] .lang-ru {display: inline;}
 }
 
 #radio-album-name {
+    width: 100%;
     font-size: 0.85rem;
     color: var(--text-muted);
     text-align: right !important;
@@ -370,17 +540,17 @@ html[lang="ru"] .lang-ru {display: inline;}
 
 .radio-controls-row {
     display: grid !important;
-    grid-template-columns: 125px 1fr 125px !important;
-    gap: 15px !important;
+    grid-template-columns: minmax(0, 1fr) 75px minmax(0, 1fr) !important;
+    gap: var(--radio-controls-gap) !important;
     align-items: center !important;
     justify-items: center !important;
-    width: 85% !important;
+    width: 100% !important;
     margin: 0 auto !important;
 }
 
 .radio-cover-thumb {
-    width: 125px !important;
-    height: 125px !important;
+    width: 100% !important;
+    height: auto !important;
     aspect-ratio: 1 / 1 !important;
     border-radius: 14px !important;
     object-fit: cover !important;
@@ -432,7 +602,7 @@ html[lang="ru"] .lang-ru {display: inline;}
 
 #retro-paddle {
     position: absolute !important;
-    bottom: 215px !important;
+    bottom: calc(var(--radio-cover-size) + 90px) !important;
     left: 50%;
     transform: translateX(-50%);
     width: 90px;
@@ -447,6 +617,7 @@ html[lang="ru"] .lang-ru {display: inline;}
 
 .retro-bullet {
     position: absolute;
+    bottom: calc(var(--radio-cover-size) + 105px);
     font-size: 2rem;
     animation: shootUpInside 1.2s linear forwards;
     pointer-events: none;
@@ -517,10 +688,74 @@ html[lang="ru"] .lang-ru {display: inline;}
 }
 
 #countdown-timer {
-    font-size: 1.3rem;        
-    font-weight: 900;        
-    letter-spacing: 0px;
-    margin-top: 10px;        
+    display: block;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    color: #000;
+    font-size: clamp(0.5rem, 5cqi, 1.15rem);
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 1.15;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.countdown-footer {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+    text-align: center;
+    container-type: inline-size;
+}
+
+.countdown-heading {
+    margin: 0 0 0.4em;
+    color: var(--warning-yellow);
+    font-size: clamp(0.8rem, 5cqi, 1.3rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.countdown-tape {
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    background: var(--warning-yellow);
+    color: #000;
+}
+
+.countdown-tape-edge {
+    overflow: hidden;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: clamp(0.65rem, 4.4cqi, 1.05rem);
+    font-weight: 900;
+    line-height: 1;
+    white-space: pre;
+}
+
+.countdown-slogan-loop {
+    display: flex;
+    position: relative;
+    left: 50%;
+    width: max-content;
+    gap: 1.5em;
+    margin: 0 auto;
+    transform: translateX(-50%);
+    font-size: clamp(0.55rem, 4.3cqi, 1rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.countdown-tape .nocodegirl-accent,
+.countdown-tape .nocodegirl-code {
+    color: #000;
 }
 
 /* ==========================================================

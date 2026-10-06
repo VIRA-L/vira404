@@ -1,0 +1,16 @@
+[FEATURED]
+track = "Не гаси — alternative rock [RU] · Vira L."
+artwork = "covers/Не гаси — alternative rock [RU] · Vira L..webp" 
+date = "22.09.2025"
+caption_en = "Не гаси — alternative rock [RU] is out! \n\nVira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀#Cyberworld #Unsubscribe #NoCodeGirl"
+caption_ru = "Не гаси — alternative rock [RU] в сети! \n\nВира Л. — 🔥 Дикая. Дерзкая. Неудержимая. Вирусная. 🚀#Cyberworld #Unsubscribe #NoCodeGirl"
+
+[WORKING]
+title_en = "ЗООДИАК<br>New album"
+title_ru = "ЗООДИАК<br>Новый альбом"
+artwork = "assets/working.webp" 
+date = "2144-12-31T18:00:00Z"
+caption1_en = "Vira L. is 🐀 Neural. Lethal. Primal.🐒 She holds the scalpel.👎\nThe zoo is about to break loose #Zootechnics #NoCodeGirl #Unsubscribe"
+caption1_ru = "Вира Л. — 🐀 Нейронная. Смертоносная. Первобытная.🐒 Скальпель в её руках.👎\nЗоопарк скоро откроется #Zootechnics #NoCodeGirl #Unsubscribe"
+caption2_en = "23.09.2026 - finished КРЫСА — alt rock [RU]\n\n30.09.2026 — Track 02 — work in progress..."
+caption2_ru = "23.09.2026 — релиз КРЫСА — alt rock [RU] готов\n\n30.09.2026 — Трек 02 — в разработке..."

@@ -57,7 +57,6 @@
 </head>
 
 <body>
-<body class="lang-en">
     <!-- Conteneur global des 4 pavés -->
     <main class="grid-container">
 
@@ -80,30 +79,34 @@
                         <span>|</span>
                         <button id="btn-lang-ru" class="btn-lang">RU</button>
                     </div>
-                    <h2 id="landing-title">
-                        <span class="lang-txt lang-en">VIRA404</span>
-                        <span class="lang-txt lang-ru">ВИРА404</span>
-                    </h2>
-                    <p id="landing-subtitle">
-                        <span class="lang-txt lang-en">#NoCodeGirl is Vira L.</span>
-                        <span class="lang-txt lang-ru">#NoCodeGirl — это Vira L.</span>
-                    </p>
-                    <p id="landing-caption1"></p>
-                    <p id="landing-caption2">
-                        <span class="lang-txt lang-en">Alternative rock, cyberpunk pop<br>and Russian digital rock<br>from the edge of the system.</span>
-                        <span class="lang-txt lang-ru">Альтернативный рок, киберпанк-поп<br>и русский диджитал-рок<br>на грани системы.</span>
-                    </p>
+                    <h2 id="landing-title"><span class="lang-txt lang-en">VIRA404</span><span class="lang-txt lang-ru">ВИРА404</span></h2>
+                    <br>
+                    <p id="landing-subtitle"><span class="lang-txt lang-en">#NoCodeGirl is Vira L.</span><span class="lang-txt lang-ru">#NoCodeGirl — это и есть Вира Л.</span></p>
+                    <br>
+                    <p id="landing-caption2"><span class="lang-txt lang-en">Alternative rock, cyberpunk pop<br>and Russian digital rock<br>from the edge of the system.</span><span class="lang-txt lang-ru">Альтернативный рок, киберпанк-поп<br>и русский диджитал-рок<br>на грани системы.</span></p>
                     <p id="landing-caption3"></p>
-                    <h1>
-                        <img src="assets/vira-l-official-red-signature.webp" 
-                             alt="Vira L. (NoCodeGirl)" 
-                             width="250" 
-                             height="134" 
-                             loading="eager"
-                             style="width: 120px; height: auto; display: block;">
-                    </h1>
                 </div>
-                <div class="pave-footer" id="landing-links"></div>
+                <div class="pave-footer social-grid" id="landing-links">
+                    <h1 class="landing-signature">
+                        <img id="landing-signature-img" src="assets/vira-l-official-red-signature.webp" alt="Vira L. (NoCodeGirl) official artist logo" width="250" height="134" loading="eager" style="width: 120px; height: auto; display: block;">
+                    </h1>
+                    <a class="social-btn" href="https://www.youtube.com/@vira_l_music" target="_blank" rel="noopener noreferrer">
+                        <span class="social-icon"><img src="assets/vira-l-official-music-channel-link.webp" alt="Vira L. official music channel artwork with a red play symbol on a white rounded square."></span>
+                        <span class="social-label">☣️YTube🎞️</span>
+                    </a>
+                    <a class="social-btn" href="https://www.instagram.com/vira_l.music/" target="_blank" rel="noopener noreferrer">
+                        <span class="social-icon"><img src="assets/vira-l-official-artist-profile-link.webp" alt="Vira L. artist profile artwork with a white camera emblem over a vivid pink, purple, and orange gradient."></span>
+                        <span class="social-label">💔Insta📸</span>
+                    </a>
+                    <a class="social-btn" href="https://suno.com/voice/3da34a18-171b-48c1-9cb7-28fd0a1ca62a" target="_blank" rel="noopener noreferrer">
+                        <span class="social-icon"><img src="assets/vira-l-music-profile-link.webp" alt="Vira L. music profile artwork with a white wordmark on a vivid orange and pink background."></span>
+                        <span class="social-label">⚡Suno🎸</span>
+                    </a>
+                    <a class="social-btn" href="mailto:viral.official@outlook.com">
+                        <span class="social-icon"><img src="assets/vira404-artist-brand-contact-link.webp" alt="VIRA404 artist emblem: a black thumbs-down on a distressed yellow square, accompanying Vira L.&#39;s contact link."></span>
+                        <span class="social-label">Complain</span>
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -126,6 +129,23 @@
 
                 <!-- 2. Le conteneur de paroles au milieu -->
                 <div id="radio-lyrics-container" class="radio-lyrics">---</div>
+                <div id="radio-playlist-drawer" data-visible-count="3">
+                    <button id="radio-playlist-handle" type="button" aria-expanded="false" aria-controls="radio-playlist-tracks">
+                        <span class="radio-playlist-grip" aria-hidden="true"></span>
+                        <span class="lang-en">RECENT · NEXT</span><span class="lang-ru">НЕДАВНО · ДАЛЕЕ</span>
+                    </button>
+                    <div id="radio-playlist-tracks" role="list"></div>
+                </div>
+                <div id="radio-game-scores" aria-label="Mini-game scores">
+                    <span class="radio-game-score">
+                        <span class="lang-en">YOU</span><span class="lang-ru">ТЫ</span>
+                        <strong id="radio-user-score">0</strong>
+                    </span>
+                    <span class="radio-game-score">
+                        <span>VIRABOT</span>
+                        <strong id="radio-virabot-score">0</strong>
+                    </span>
+                </div>
                 <a id="radio-download-btn" style="display:none;" href="" download></a>
 
                 <!-- 3. Le footer en bas -->
@@ -141,9 +161,9 @@
                     </div>
 
                     <div class="radio-controls-row">
-                        <img id="radio-cover-img" class="radio-cover-thumb" src="" alt="Viral radio live stream track cover and dark aesthetics, copper-haired singer" />
+                        <img id="radio-cover-img" class="radio-cover-thumb" src="covers/00a-track-nocode.webp" alt="Viral radio live stream track cover and dark aesthetics, copper-haired singer" />
                         <button id="radio-toggle-btn" class="btn-ctrl" aria-label="Play or pause radio stream"><span style="margin-left: 4px;">▶</span></button>
-                        <img id="radio-album-img" class="radio-cover-thumb" src="" alt="Official VIRA404 music player artwork, NoCodeGirl thumbdown emblem or album cover." />
+                        <img id="radio-album-img" class="radio-cover-thumb" src="covers/00a-album-nocode.webp" alt="Official VIRA404 music player artwork, NoCodeGirl thumbdown emblem or album cover." />
                     </div>
                 </div>
 
@@ -160,11 +180,8 @@
                         <span class="lang-txt lang-ru">РЕЛИЗ</span>
                     </h2>
                     <h3></h3>
-                    <p id="featured-date" class="featured-date">22.09.2025</p>
-                    <p id="featured-caption">
-                        <span class="lang-txt lang-en">Не гаси — alternative rock [RU] is out!<br><br>Vira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀<br>#Cyberworld #Unsubscribe #NoCodeGirl</span>
-                        <span class="lang-txt lang-ru">Не гаси — alternative rock [RU] вышел!<br><br>Vira L. 🔥 Дерзко. Неостановимо. Вирусно. 🚀<br>#Cyberworld #Unsubscribe #NoCodeGirl</span>
-                    </p>
+                    <p id="featured-date" class="featured-date">[ 22.09.2025 ]</p>
+                    <p id="featured-caption"><span class="lang-txt lang-en">Не гаси — alternative rock [RU] is out! <br><br>Vira L. is 🔥 Raw. Bold. Unstoppable. Viral. 🚀#Cyberworld #Unsubscribe #NoCodeGirl</span><span class="lang-txt lang-ru">Не гаси — alternative rock [RU] в сети! <br><br>Вира Л. — 🔥 Дикая. Дерзкая. Неудержимая. Вирусная. 🚀#Cyberworld #Unsubscribe #NoCodeGirl</span></p>
                 </div>
 
                 <div class="artwork-box" id="featured-artwork-container">
@@ -196,26 +213,34 @@
                         <span class="lang-txt lang-ru">В РАБОТЕ</span>
                     </h2>
                     <h3></h3>
-                    <h4 id="working-title">
-                        <span class="lang-txt lang-en">ЗООДИАК<br>New album</span>
-                        <span class="lang-txt lang-ru">ЗООДИАК<br>Новый альбом</span>
-                    </h4>
-                    <p id="working-caption1">
-                        <span class="lang-txt lang-en">Vira L. is 🐀 Neural. Lethal. Primal.🐉 She holds the scalpel.👎<br>Zootechnics soon #Zootechnics #NoCodeGirl #Unsubscribe</span>
-                        <span class="lang-txt lang-ru">Vira L. 🐀 Нейронно. Смертельно. Первобытно.🐉<br>Зоопарк скоро откроется #Zootechnics #NoCodeGirl #Unsubscribe</span>
-                    </p>
-                    <p id="working-caption2">
-                        <span class="lang-txt lang-en">23.09.2026 - finished КРЫСА — alt rock [RU]<br><br>30.09.2026 - Track 02 - work in progress...</span>
-                        <span class="lang-txt lang-ru">23.09.2026 - готово КРЫСА — alt rock [RU]<br><br>30.09.2026 - Трек 02 - в работе...</span>
-                    </p>
+                    <h4 id="working-title"><span class="lang-txt lang-en">ЗООДИАК<br>New album</span><span class="lang-txt lang-ru">ЗООДИАК<br>Новый альбом</span></h4>
+                    <br>
+                    <p id="working-caption1"><span class="lang-txt lang-en">Vira L. is 🐀 Neural. Lethal. Primal.🐒 She holds the scalpel.👎<br>The zoo is about to break loose #Zootechnics #NoCodeGirl #Unsubscribe</span><span class="lang-txt lang-ru">Вира Л. — 🐀 Нейронная. Смертоносная. Первобытная.🐒 Скальпель в её руках.👎<br>Зоопарк скоро откроется #Zootechnics #NoCodeGirl #Unsubscribe</span></p>
+                    <br>
+                    <p id="working-caption2"><span class="lang-txt lang-en">23.09.2026 - finished КРЫСА — alt rock [RU]<br><br>30.09.2026 — Track 02 — work in progress...</span><span class="lang-txt lang-ru">23.09.2026 — релиз КРЫСА — alt rock [RU] готов<br><br>30.09.2026 — Трек 02 — в разработке...</span></p>
                 </div>
 
                 <div class="artwork-box" id="working-artwork-container">
                     <img id="working-cover-img" src="assets/working.webp" alt="Music cover art, featuring the young copper-haired female singer NoCodeGirl." class="bg-artwork-img">
                 </div>
 
-                <div class="pave-footer">
-                    <div id="countdown-timer">00j 00h 00m 00s</div>
+                <div class="pave-footer countdown-footer">
+                    <p class="countdown-heading">
+                        <span class="lang-txt lang-en">STAY TUNED :</span>
+                        <span class="lang-txt lang-ru">ОСТАВАЙТЕСЬ НА СВЯЗИ :</span>
+                    </p>
+                    <div class="countdown-tape" aria-label="Warning tape countdown">
+                        <div class="countdown-tape-edge" aria-hidden="true">▀▀▀▀    ▀▀▀▀    ▀▀▀▀    ▀▀▀▀    ▀▀▀▀    ▀▀▀▀</div>
+                        <time id="countdown-timer" datetime="2144-12-31T18:00:00Z"><span id="countdown-value">31.12.2144</span></time>
+                        <div class="countdown-slogan-loop" aria-label="NOCODEGIRL - UNSUBSCRIBE">
+                            <span>NOCODEGIRL - UNSUBSCRIBE</span>
+                            <span aria-hidden="true">NOCODEGIRL - UNSUBSCRIBE</span>
+                            <span aria-hidden="true">NOCODEGIRL - UNSUBSCRIBE</span>
+                            <span aria-hidden="true">NOCODEGIRL - UNSUBSCRIBE</span>
+                            <span aria-hidden="true">NOCODEGIRL - UNSUBSCRIBE</span>
+                        </div>
+                        <div class="countdown-tape-edge" aria-hidden="true">▄▄▄▄    ▄▄▄▄    ▄▄▄▄    ▄▄▄▄    ▄▄▄▄    ▄▄▄▄</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -223,5 +248,6 @@
     </main>
 
     <script src="vira404-dark-alt-pop-script.js"></script>
+    <script src="vira404-like-my-music.js"></script>
 </body>
 </html>
