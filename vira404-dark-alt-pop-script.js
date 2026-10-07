@@ -17,6 +17,8 @@ const appState = {
     countdownInterval: null,
     featuredAudio: null,
     radioAudio: null,
+    radioPlayingTrackIndex: -1,
+    radioBoundaryTimeout: null,
     radioStartInProgress: false,
     radioActionTrack: null,
     radioDownloadCooldownInterval: null,
@@ -25,7 +27,7 @@ const appState = {
 const RADIO_DOWNLOAD_TIMESTAMP_KEY = 'trackDownloaded';
 const RADIO_DOWNLOAD_TRACK_KEY = 'trackDownloadedTrack';
 const RADIO_DOWNLOAD_COOLDOWN_MS = 30_000;
-const RADIO_TELEGRAM_GROUP_USERNAME = 'nocodefans';
+const RADIO_TELEGRAM_GROUP_URL = 'https://t.me/nocodefans';
 const RADIO_DOWNLOAD_ACTION_IDS = [
     'radio-download-actions',
     'radio-direct-download',
@@ -898,9 +900,7 @@ function initRadioControls() {
         };
     }
 
-    audio.onended = () => {
-        startRadioAudio();
-    };
+    audio.onended = handleRadioAudioEnded;
 
     if (dom['feat-volume']) {
         dom['feat-volume'].value = audio.volume;
@@ -915,6 +915,7 @@ async function startRadioAudio() {
 
     if (appState.radioStartInProgress) return;
     appState.radioStartInProgress = true;
+    clearRadioBoundaryTimeout();
 
     try {
         if (radioTitle) radioTitle.classList.add('pulsing-text');
@@ -931,6 +932,7 @@ async function startRadioAudio() {
         audio.currentTime = state.offset;
 
         await audio.play();
+        appState.radioPlayingTrackIndex = state.trackIndex;
         if (playBtn) {
             playBtn.classList.add('playing');
             playBtn.innerHTML = '❚❚';
@@ -952,6 +954,8 @@ function stopRadioAudio() {
 
     if (radioTitle) radioTitle.classList.remove('pulsing-text');
     if (audio) audio.pause();
+    appState.radioPlayingTrackIndex = -1;
+    clearRadioBoundaryTimeout();
 
     if (playBtn) {
         playBtn.classList.remove('playing');
@@ -963,6 +967,37 @@ function stopRadioAudio() {
     }
 
     disableRadioDownload();
+}
+
+function handleRadioAudioEnded() {
+    const state = getLiveRadioState();
+    if (!state) return;
+
+    if (state.trackIndex !== appState.radioPlayingTrackIndex) {
+        startRadioAudio();
+        return;
+    }
+
+    appState.radioBoundaryTimeout = setTimeout(waitForRadioTrackBoundary, state.remaining * 1000 + 50);
+}
+
+function waitForRadioTrackBoundary() {
+    appState.radioBoundaryTimeout = null;
+    const state = getLiveRadioState();
+    if (!state) return;
+
+    if (state.trackIndex !== appState.radioPlayingTrackIndex) {
+        startRadioAudio();
+        return;
+    }
+
+    appState.radioBoundaryTimeout = setTimeout(waitForRadioTrackBoundary, state.remaining * 1000 + 50);
+}
+
+function clearRadioBoundaryTimeout() {
+    if (!appState.radioBoundaryTimeout) return;
+    clearTimeout(appState.radioBoundaryTimeout);
+    appState.radioBoundaryTimeout = null;
 }
 
 function enableRadioDownload() {
@@ -1043,7 +1078,7 @@ function initRadioActionBar() {
 
         const message = `Thanks for the download 🤘 — ${getRadioShareTrackTitle(track)}`;
         void copyRadioJoinMessage(message);
-        const telegramUrl = `tg://resolve?domain=${RADIO_TELEGRAM_GROUP_USERNAME}&text=${encodeURIComponent(message)}`;
+        const telegramUrl = `${RADIO_TELEGRAM_GROUP_URL}?text=${encodeURIComponent(message)}`;
         window.open(telegramUrl, '_blank', 'noopener,noreferrer');
         closeRadioDownloadActions();
     };
