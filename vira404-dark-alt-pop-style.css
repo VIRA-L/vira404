@@ -562,6 +562,96 @@ html[lang="ru"] .lang-ru {display: inline;}
 #radio-cover-img.downloadable:hover { cursor: pointer; }
 #radio-album-img:hover { cursor: no-drop; }
 
+.radio-download-actions {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 10000;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: min(420px, calc(100vw - 16px));
+    padding: 8px;
+    border: 1px solid var(--accent-teal);
+    border-radius: 12px;
+    background: rgba(8, 8, 8, 0.96);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.75), 0 0 14px rgba(54, 156, 163, 0.35);
+    transform: translate(-50%, -100%);
+}
+
+.radio-download-actions[hidden] {
+    display: none;
+}
+
+.radio-download-actions.is-open {
+    display: grid;
+}
+
+.radio-download-actions.is-below {
+    transform: translate(-50%, 0);
+}
+
+.radio-action-button {
+    display: flex;
+    min-width: 0;
+    min-height: 92px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 4px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background: #171717;
+    color: #fff;
+    font: inherit;
+    font-size: clamp(10px, 2.7vw, 13px);
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    cursor: pointer;
+}
+
+.radio-action-button:hover:not(:disabled),
+.radio-action-button:focus-visible {
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 10px rgba(54, 156, 163, 0.45);
+    outline: none;
+}
+
+.radio-action-button img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+#radio-direct-download img,
+#radio-download-share img {
+    filter: brightness(0) invert(1);
+}
+
+.radio-action-button:disabled {
+    border-color: var(--warning-yellow);
+    color: var(--warning-yellow);
+    cursor: not-allowed;
+    opacity: 0.68;
+}
+
+.radio-action-countdown:not(:empty) {
+    font-variant-numeric: tabular-nums;
+}
+
+.radio-action-status {
+    grid-column: 1 / -1;
+    color: var(--accent-teal);
+    font-size: 11px;
+    text-align: center;
+}
+
+.radio-action-status:empty {
+    display: none;
+}
+
 #radio-toggle-btn {
     width: 75px !important;
     height: 75px !important;
@@ -868,7 +958,7 @@ html[lang="ru"] .lang-ru {display: inline;}
 /* ==========================================================
  * 07. RESPONSIVE MOBILE
  * ========================================================== */
-@media (max-width: 1024px) {
+@media (max-width: 1024px) and (orientation: portrait) {
     .grid-container {
         display: flex;
         flex-direction: row;
@@ -897,5 +987,11 @@ html[lang="ru"] .lang-ru {display: inline;}
         width: 30%;
         margin-left: 15px;
         margin-right: auto;
+    }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) {
+    html {
+        font-size: 50%;
     }
 }

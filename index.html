@@ -39,11 +39,13 @@
   "sameAs": [
     "https://www.youtube.com/@vira_l_music",
     "https://www.instagram.com/vira_l.music/",
-    "https://suno.com/voice/3da34a18-171b-48c1-9cb7-28fd0a1ca62a"
+    "https://suno.com/voice/3da34a18-171b-48c1-9cb7-28fd0a1ca62a",
+    "https://t.me/nocodegirl"
   ],
   "album": [
     { "@type": "MusicAlbum", "name": "CTRL-ALT-ME" },
     { "@type": "MusicAlbum", "name": "VIRA:L" },
+    { "@type": "MusicAlbum", "name": "SOFIA" },
     { "@type": "MusicAlbum", "name": "Пропаганда" }
   ],
   "track": [
@@ -92,18 +94,18 @@
                     </h1>
                     <a class="social-btn" href="https://www.youtube.com/@vira_l_music" target="_blank" rel="noopener noreferrer">
                         <span class="social-icon"><img src="assets/vira-l-official-music-channel-link.webp" alt="Vira L. official music channel artwork with a red play symbol on a white rounded square."></span>
-                        <span class="social-label">☣️YTube🎞️</span>
+                        <span class="social-label">🎸YTube</span>
                     </a>
                     <a class="social-btn" href="https://www.instagram.com/vira_l.music/" target="_blank" rel="noopener noreferrer">
-                        <span class="social-icon"><img src="assets/vira-l-official-artist-profile-link.webp" alt="Vira L. artist profile artwork with a white camera emblem over a vivid pink, purple, and orange gradient."></span>
-                        <span class="social-label">💔Insta📸</span>
+                        <span class="social-icon"><img src="assets/vira-l-official-artist-profile-link.webp" alt="Vira L. singer profile artwork with a white camera emblem over a vivid pink, purple, and orange gradient."></span>
+                        <span class="social-label">💔Insta</span>
                     </a>
-                    <a class="social-btn" href="https://suno.com/voice/3da34a18-171b-48c1-9cb7-28fd0a1ca62a" target="_blank" rel="noopener noreferrer">
-                        <span class="social-icon"><img src="assets/vira-l-music-profile-link.webp" alt="Vira L. music profile artwork with a white wordmark on a vivid orange and pink background."></span>
-                        <span class="social-label">⚡Suno🎸</span>
+                    <a class="social-btn" href="https://t.me/nocodegirl" target="_blank" rel="noopener noreferrer">
+                        <span class="social-icon"><img src="assets/vira-l-social-profile-link.svg" alt="Nocodegirl social profile artwork with a white paper plane and blue background."></span>
+                        <span class="social-label">Telegram</span>
                     </a>
                     <a class="social-btn" href="mailto:viral.official@outlook.com">
-                        <span class="social-icon"><img src="assets/vira404-artist-brand-contact-link.webp" alt="VIRA404 artist emblem: a black thumbs-down on a distressed yellow square, accompanying Vira L.&#39;s contact link."></span>
+                        <span class="social-icon"><img src="assets/vira404-artist-brand-contact-link.webp" alt="VIRA404 artist emblem: a black thumbs-down on a distressed yellow square, accompanying artist&#39;s contact link."></span>
                         <span class="social-label">Complain</span>
                     </a>
                 </div>
@@ -121,8 +123,8 @@
                 <!-- 1. Le Header en haut -->
                 <div class="pave-header">
                     <h2 id="radio-title-header">
-                        <span class="lang-txt lang-en">LIVE RADIO</span>
-                        <span class="lang-txt lang-ru">ПРЯМОЙ ЭФИР</span>
+                        <span class="lang-txt lang-en">NOCODE FM</span>
+                        <span class="lang-txt lang-ru">НОУ-КОД FM</span>
                     </h2>
                     <h3></h3>
                 </div>
@@ -147,6 +149,22 @@
                     </span>
                 </div>
                 <a id="radio-download-btn" style="display:none;" href="" download></a>
+                <div id="radio-download-actions" class="radio-download-actions" role="group" aria-label="Track actions" aria-hidden="true" hidden>
+                    <button id="radio-direct-download" class="radio-action-button" type="button">
+                        <img src="assets/vira404-direct-download.webp" alt="" aria-hidden="true">
+                        <span class="lang-en">Direct DL</span><span class="lang-ru">Скачать</span>
+                        <span id="radio-direct-countdown" class="radio-action-countdown" aria-live="polite"></span>
+                    </button>
+                    <button id="radio-download-share" class="radio-action-button" type="button">
+                        <img src="assets/vira404-download-share.webp" alt="" aria-hidden="true">
+                        <span class="lang-en">Download &amp; Share</span><span class="lang-ru">Скачать и поделиться</span>
+                    </button>
+                    <button id="radio-download-join" class="radio-action-button" type="button">
+                        <img src="assets/vira404-artist-brand-contact-link.webp" alt="" aria-hidden="true">
+                        <span class="lang-en">Download &amp; Join</span><span class="lang-ru">Скачать и вступить</span>
+                    </button>
+                    <p id="radio-action-status" class="radio-action-status" role="status" aria-live="polite"></p>
+                </div>
 
                 <!-- 3. Le footer en bas -->
                 <div class="pave-footer">
@@ -176,8 +194,8 @@
             <div class="pave-content">
                 <div class="pave-header">
                     <h2 id="featured-title-header">
-                        <span class="lang-txt lang-en">FEATURED</span>
-                        <span class="lang-txt lang-ru">РЕЛИЗ</span>
+                        <span class="lang-txt lang-en">VIRAL PICK</span>
+                        <span class="lang-txt lang-ru">ВИРАЛ ВЫБОР</span>
                     </h2>
                     <h3></h3>
                     <p id="featured-date" class="featured-date">[ 22.09.2025 ]</p>
@@ -209,8 +227,8 @@
             <div class="pave-content">
                 <div class="pave-header">
                     <h2>
-                        <span class="lang-txt lang-en">WORKING</span>
-                        <span class="lang-txt lang-ru">В РАБОТЕ</span>
+                        <span class="lang-txt lang-en">404 LAB</span>
+                        <span class="lang-txt lang-ru">404 ЛАБ</span>
                     </h2>
                     <h3></h3>
                     <h4 id="working-title"><span class="lang-txt lang-en">ЗООДИАК<br>New album</span><span class="lang-txt lang-ru">ЗООДИАК<br>Новый альбом</span></h4>
