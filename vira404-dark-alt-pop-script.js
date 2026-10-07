@@ -25,7 +25,7 @@ const appState = {
 const RADIO_DOWNLOAD_TIMESTAMP_KEY = 'trackDownloaded';
 const RADIO_DOWNLOAD_TRACK_KEY = 'trackDownloadedTrack';
 const RADIO_DOWNLOAD_COOLDOWN_MS = 30_000;
-const RADIO_TELEGRAM_GROUP_URL = 'https://t.me/nocodefans';
+const RADIO_TELEGRAM_GROUP_USERNAME = 'nocodefans';
 const RADIO_DOWNLOAD_ACTION_IDS = [
     'radio-download-actions',
     'radio-direct-download',
@@ -1042,7 +1042,8 @@ function initRadioActionBar() {
         }
 
         const message = `Thanks for the download 🤘 — ${getRadioShareTrackTitle(track)}`;
-        const telegramUrl = `${RADIO_TELEGRAM_GROUP_URL}?text=${encodeURIComponent(message)}`;
+        void copyRadioJoinMessage(message);
+        const telegramUrl = `tg://resolve?domain=${RADIO_TELEGRAM_GROUP_USERNAME}&text=${encodeURIComponent(message)}`;
         window.open(telegramUrl, '_blank', 'noopener,noreferrer');
         closeRadioDownloadActions();
     };
@@ -1248,6 +1249,18 @@ async function shareRadioTrack(track) {
         setRadioActionStatus(appState.currentLang === 'RU'
             ? 'Не удалось скопировать ссылку.'
             : 'Could not copy the share link.');
+    }
+}
+
+async function copyRadioJoinMessage(message) {
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(message);
+        } else if (!copyTextToClipboard(message)) {
+            throw new Error('Clipboard access is unavailable.');
+        }
+    } catch (error) {
+        console.error('Could not copy the Telegram thank-you message.', error);
     }
 }
 
