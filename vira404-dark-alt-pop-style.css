@@ -135,6 +135,46 @@ html[lang="ru"] .lang-ru {display: inline;}
     font-weight: 600; 
 }
 
+.zoodiak-event-trigger {
+    position: absolute;
+    top: 48%;
+    right: 12px;
+    z-index: 4;
+    display: flex;
+    max-width: calc(100% - 24px);
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 10px;
+    border: 1px solid rgba(0, 243, 255, 0.55);
+    border-radius: 12px;
+    background: rgba(8, 8, 8, 0.78);
+    color: #fff;
+    font: inherit;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    animation: zoodiakBadgePulse 2.8s ease-in-out infinite;
+}
+
+.zoodiak-event-trigger img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.zoodiak-event-trigger:focus-visible {
+    outline: 2px solid #00f3ff;
+    outline-offset: 3px;
+}
+
+@keyframes zoodiakBadgePulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(0, 243, 255, 0.25); }
+    50% { box-shadow: 0 0 14px rgba(0, 243, 255, 0.65); }
+}
+
 .nocodegirl-accent {
     color: var(--accent-fuchsia);
 }
@@ -376,11 +416,53 @@ html[lang="ru"] .lang-ru {display: inline;}
 }
 
 .radio-playlist-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.radio-playlist-title-text {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: 600;
+}
+
+.radio-playlist-lyrics-badge {
+    flex: 0 0 auto;
+    color: var(--accent-teal);
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.radio-playlist-broadcast {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.58rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.radio-playlist-broadcast.is-live {
+    color: var(--accent-teal);
+}
+
+.radio-playlist-live-dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: var(--accent-teal);
+    box-shadow: 0 0 6px var(--accent-teal);
 }
 
 .radio-playlist-details {
@@ -777,6 +859,207 @@ html[lang="ru"] .lang-ru {display: inline;}
     text-align: center;
 }
 
+#working-cover-img {
+    cursor: pointer;
+}
+
+.zoodiak-game-overlay[hidden] {
+    display: none;
+}
+
+.zoodiak-game-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: grid;
+    place-items: center;
+    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(5px);
+}
+
+.zoodiak-game-dialog {
+    position: relative;
+    width: min(560px, 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: clamp(16px, 4vw, 28px);
+    border: 1px solid var(--accent-teal);
+    border-radius: 16px;
+    background: linear-gradient(150deg, #171717, #080808 72%);
+    color: #fff;
+    box-shadow: 0 0 32px rgba(54, 156, 163, 0.3);
+    text-align: center;
+}
+
+.zoodiak-game-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    border: 1px solid #444;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.zoodiak-game-title {
+    margin: 0 40px 20px;
+    color: #00f3ff;
+    font-size: clamp(1.1rem, 4vw, 1.55rem);
+    letter-spacing: 0.08em;
+}
+
+.zoodiak-reel {
+    position: relative;
+    width: min(100%, 360px);
+    height: 84px;
+    overflow: hidden;
+    margin: 0 auto 20px;
+    border: 1px solid #343434;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.zoodiak-reel-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    will-change: transform;
+}
+
+.zoodiak-reel-item {
+    display: grid;
+    width: 60px;
+    height: 60px;
+    flex: 0 0 60px;
+    place-items: center;
+    font-size: 2rem;
+    user-select: none;
+}
+
+.zoodiak-reel-marker {
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 50%;
+    width: 60px;
+    border: 2px solid #00f3ff;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.55), inset 0 0 10px rgba(0, 243, 255, 0.16);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.zoodiak-game-result {
+    display: grid;
+    grid-template-columns: minmax(100px, 180px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: center;
+    margin: 0 auto 18px;
+    text-align: left;
+}
+
+.zoodiak-game-result[hidden] {
+    display: none;
+}
+
+.zoodiak-game-result img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(0, 243, 255, 0.45);
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.zoodiak-game-result .zoodiak-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.zoodiak-game-result .zoodiak-symbol {
+    display: none;
+}
+
+.zoodiak-game-result h5 {
+    margin-bottom: 8px;
+    color: var(--warning-yellow);
+    font-size: 1.25rem;
+    font-weight: 900;
+}
+
+.zoodiak-game-result p {
+    color: #ddd;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.zoodiak-game-status {
+    min-height: 1.4em;
+    margin: 0 0 10px;
+    color: #00f3ff;
+    font-size: 0.85rem;
+}
+
+.zoodiak-game-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.zoodiak-game-actions button {
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid var(--accent-teal);
+    border-radius: 8px;
+    background: #101818;
+    color: #fff;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.zoodiak-game-actions button:hover,
+.zoodiak-game-actions button:focus-visible {
+    border-color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+    outline: none;
+}
+
+.zoodiak-game-actions button:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.zoodiak-totem-badge {
+    color: #00f3ff;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+@media (max-width: 420px) {
+    .zoodiak-game-result {
+        grid-template-columns: 100px minmax(0, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .zoodiak-event-trigger {
+        animation: none;
+    }
+}
+
 #countdown-timer {
     display: block;
     width: 100%;
@@ -955,10 +1238,59 @@ html[lang="ru"] .lang-ru {display: inline;}
     border-bottom: 2px solid var(--accent-fuchsia);
 }
 
+.carousel-pagination {
+    display: none;
+}
+
 /* ==========================================================
  * 07. RESPONSIVE MOBILE
  * ========================================================== */
 @media (max-width: 1024px) and (orientation: portrait) {
+    .carousel-pagination:not([hidden]) {
+        position: fixed;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        left: 50%;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 2px 6px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        background: rgba(11, 11, 11, 0.78);
+        transform: translateX(-50%);
+    }
+
+    .carousel-pagination button {
+        display: grid;
+        width: 22px;
+        height: 22px;
+        place-items: center;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .carousel-pagination button::before {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        content: "";
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .carousel-pagination button[aria-current="page"]::before {
+        background: #00f3ff;
+        box-shadow: 0 0 8px #00f3ff;
+    }
+
+    .carousel-pagination button:focus-visible {
+        border-radius: 50%;
+        outline: 2px solid #00f3ff;
+        outline-offset: -2px;
+    }
+
     .grid-container {
         display: flex;
         flex-direction: row;
