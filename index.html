@@ -222,8 +222,18 @@
                         <span class="lang-txt lang-en">NOCODE FM</span>
                         <span class="lang-txt lang-ru">НОУ-КОД FM</span>
                     </h2>
-                    <h3></h3>
+                    <div class="radio-recorder-controls">
+                        <button id="radio-recorder-button" class="radio-recorder-button" type="button" aria-label="Start radio recording" aria-pressed="false">
+                            <img src="assets/vira404-nocode-recorder.webp" alt="" aria-hidden="true" width="28" height="28">
+                        </button>
+                        <span id="radio-recorder-timer" class="radio-recorder-timer" hidden>00:00</span>
+                    </div>
                 </div>
+                <div id="radio-recorder-watermark" class="radio-recorder-watermark" aria-hidden="true" hidden>
+                    <span data-watermark-text>NOCODE FM // VIRA404.COM</span>
+                    <img src="assets/nocodegirl-thumbdown-emblem.png" alt="" width="16" height="16">
+                </div>
+                <p id="radio-recorder-status" class="radio-recorder-status" role="status" aria-live="polite"></p>
 
                 <!-- 2. Le conteneur de paroles au milieu -->
                 <div id="radio-lyrics-container" class="radio-lyrics">---</div>
